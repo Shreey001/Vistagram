@@ -9,13 +9,12 @@ export interface Post {
   image_url: string;
   created_at: string;
   avatar_url: string | null;
+  comment_count?: number;
+  like_count?: number;
 }
 
 const fetchPosts = async (): Promise<Post[]> => {
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.rpc("get_posts_with_counts");
 
   if (error) throw new Error(error.message);
 

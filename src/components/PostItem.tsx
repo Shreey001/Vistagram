@@ -46,6 +46,12 @@ export const PostItem = ({ post }: Props) => {
               {post.content.substring(0, 100)}...
             </p>
           </div>
+          <div className="p-4 flex items-center gap-2">
+            <span className="text-pink-500 font-bold">❤️</span>{" "}
+            {post.like_count ?? 0}
+            <span className="text-pink-500 font-bold">💬</span>{" "}
+            {post.comment_count ?? 0}
+          </div>
         </div>
       </Link>
     </div>
