@@ -46,11 +46,23 @@ export const PostItem = ({ post }: Props) => {
               {post.content.substring(0, 100)}...
             </p>
           </div>
-          <div className="p-4 flex items-center gap-2">
-            <span className="text-pink-500 font-bold">❤️</span>{" "}
-            {post.like_count ?? 0}
-            <span className="text-pink-500 font-bold">💬</span>{" "}
-            {post.comment_count ?? 0}
+        </div>
+        {/* Engagement Metrics */}
+        <div className="p-4 bg-gray-900/70 border-t border-purple-500/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 px-3 py-1.5 rounded-full border border-purple-500/20 hover:border-pink-500/30 transition-all duration-300">
+                <span className="text-lg">❤️</span>
+                <span className="font-medium text-pink-400">{post.like_count ?? 0}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 px-3 py-1.5 rounded-full border border-purple-500/20 hover:border-pink-500/30 transition-all duration-300">
+                <span className="text-lg">💬</span>
+                <span className="font-medium text-purple-400">{post.comment_count ?? 0}</span>
+              </div>
+            </div>
+            <div className="text-xs text-gray-400 bg-gray-800/50 px-3 py-1 rounded-full">
+              View Post
+            </div>
           </div>
         </div>
       </Link>

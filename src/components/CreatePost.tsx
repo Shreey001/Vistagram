@@ -1,12 +1,21 @@
 import { ChangeEvent, useState, useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
+import { motion } from "framer-motion";
+import { fetchCommunities } from "./CommunityList";
 
 interface PostInput {
   title: string;
   content: string;
   avatar_url?: string;
+  community_id?: number | null;
+}
+
+interface Community {
+  id: number;
+  name: string;
+  description: string;
 }
 
 const createPost = async (post: PostInput, ImageFile: File) => {
@@ -38,8 +47,14 @@ export const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [communityId, setCommunityId] = useState<number | null>(null);
 
   const { user } = useAuth();
+
+  const { data: communities } = useQuery<Community[], Error>({
+    queryKey: ["communities"],
+    queryFn: fetchCommunities,
+  });
 
   const { mutate, isPending, isError, isSuccess } = useMutation({
     mutationFn: (data: { post: PostInput; imageFile: File }) => {
@@ -75,6 +90,7 @@ export const CreatePost = () => {
         title,
         content,
         avatar_url: user?.user_metadata.avatar_url || null,
+        community_id: communityId,
       },
       imageFile: selectedFile,
     });
@@ -86,18 +102,29 @@ export const CreatePost = () => {
     }
   };
 
+  const handleCommunityChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setCommunityId(value ? Number(value) : null);
+  };
+
   return (
-    <form
+    <motion.form
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       onSubmit={handleSubmit}
-      className="max-w-2xl mx-auto space-y-6 bg-gray-900/50 p-6 rounded-lg shadow-lg"
+      className="max-w-2xl mx-auto space-y-6 bg-gray-900/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-purple-500/20 hover:border-pink-500/30 transition-all duration-300"
     >
-      <div>
-        <label
+      <div className="space-y-2">
+        <motion.label
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
           htmlFor="title"
-          className="block mb-2 font-semibold text-gray-200"
+          className="block font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500"
         >
           Title
-        </label>
+        </motion.label>
         <input
           type="text"
           id="title"
@@ -125,6 +152,23 @@ export const CreatePost = () => {
           placeholder="Write your post content here..."
         />
       </div>
+
+      <div>
+        <label>Select Community</label>
+        <select
+          id="community"
+          onChange={handleCommunityChange}
+          className="w-full border border-white/20 bg-black/30 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+        >
+          <option value="">-- Select Community --</option>
+          {communities?.map((community, key) => (
+            <option key={key} value={community.id}>
+              {community.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div>
         <label
           htmlFor="image"
@@ -172,6 +216,6 @@ export const CreatePost = () => {
           Post created successfully!
         </p>
       )}
-    </form>
+    </motion.form>
   );
 };
