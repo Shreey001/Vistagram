@@ -7,10 +7,22 @@ interface Props {
   compact?: boolean;
 }
 
+// Function to strip HTML tags for preview
+const stripHtmlTags = (html: string): string => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+};
+
 export const PostItem = ({ post, compact = false }: Props) => {
   if (compact) {
     return <CompactPostItem post={post} />;
   }
+
+  // Prepare content for preview
+  const contentPreview =
+    post.content.includes("<") && post.content.includes(">")
+      ? stripHtmlTags(post.content)
+      : post.content;
 
   return (
     <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 shadow-lg rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-xl h-full flex flex-col">
@@ -49,7 +61,7 @@ export const PostItem = ({ post, compact = false }: Props) => {
 
           {/* Content preview */}
           <p className="text-sm text-gray-300 line-clamp-3 mb-4 flex-grow">
-            {post.content}
+            {contentPreview}
           </p>
 
           {/* Author info */}
@@ -132,6 +144,12 @@ export const PostItem = ({ post, compact = false }: Props) => {
 };
 
 const CompactPostItem = ({ post }: { post: Post }) => {
+  // Prepare content for preview
+  const contentPreview =
+    post.content.includes("<") && post.content.includes(">")
+      ? stripHtmlTags(post.content)
+      : post.content;
+
   return (
     <motion.div
       whileHover={{ y: -5 }}

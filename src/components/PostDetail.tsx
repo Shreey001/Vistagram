@@ -153,10 +153,15 @@ export const PostDetail = ({ postId }: Props) => {
       </div>
 
       <div className="max-w-3xl mx-auto p-8">
-        <div className="prose prose-lg prose-invert max-w-none">
-          <p className="text-lg text-gray-300 leading-relaxed whitespace-pre-wrap first-letter:text-4xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-pink-500">
-            {data?.content}
-          </p>
+        <div className="prose prose-lg prose-invert prose-headings:text-pink-400 prose-a:text-purple-400 prose-strong:text-white prose-ul:text-gray-300 prose-ol:text-gray-300 max-w-none">
+          {/* Check if content contains HTML tags */}
+          {data?.content.includes("<") && data?.content.includes(">") ? (
+            <div dangerouslySetInnerHTML={{ __html: data?.content }} />
+          ) : (
+            <p className="text-lg text-gray-300 leading-relaxed whitespace-pre-wrap first-letter:text-4xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-pink-500">
+              {data?.content}
+            </p>
+          )}
         </div>
 
         <div className="mt-12 space-y-8">

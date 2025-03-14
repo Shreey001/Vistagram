@@ -1,9 +1,19 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import { fetchCommunities } from "./CommunityList";
+
+// TipTap Editor Imports
+import { useEditor, EditorContent, Editor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import Placeholder from "@tiptap/extension-placeholder";
+import Image from "@tiptap/extension-image";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
 
 interface PostInput {
   title: string;
@@ -29,6 +39,232 @@ const createPost = async (post: PostInput) => {
   }
 };
 
+// Menu bar component for the text editor
+const MenuBar = ({ editor }: { editor: Editor | null }) => {
+  if (!editor) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-1 py-2 px-2 border-b border-purple-500/30 mb-3 bg-gray-800/20 rounded-t-lg">
+      <button
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        disabled={!editor.can().chain().focus().toggleBold().run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive("bold")
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Bold"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
+          <path d="M6 20.25a.75.75 0 01-.75-.75V10.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75v9a.75.75 0 01-.75.75H6z" />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        disabled={!editor.can().chain().focus().toggleItalic().run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive("italic")
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Italic"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path d="M15 4.5c-1.215 0-2.342.53-3.11 1.454a.75.75 0 01-1.08.144L8.03 4.57a1.72 1.72 0 00-2.42.32A1.72 1.72 0 005.3 7.31l3.78 3.78a.75.75 0 01.144 1.08C8.53 13.16 8 14.287 8 15.5c0 .545.123 1.06.346 1.525a.75.75 0 01-.383.976l-3.335 1.462a.75.75 0 01-.985-.434A13.19 13.19 0 013 15.5c0-3.727 1.541-7.1 4.024-9.517C9.554 3.501 12.186 2 15 2h2.25a.75.75 0 010 1.5H15z" />
+          <path d="M20.753 15.31a.75.75 0 01.144-1.08A6.1 6.1 0 0022 10.5c0-.546-.124-1.064-.35-1.527a.75.75 0 01.383-.976l3.336-1.462a.75.75 0 01.985.435c.21.532.331 1.102.331 1.688 0 3.726-1.54 7.1-4.024 9.516C20.145 20.656 17.515 22.157 14.7 22.157h-2.25a.75.75 0 010-1.5h2.25c1.215 0 2.342-.53 3.11-1.454a.75.75 0 01.943-.107z" />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive("underline")
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Underline"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path d="M6.25 6.375a4.125 4.125 0 118.25 0v6a4.125 4.125 0 01-8.25 0v-6zM3.25 19.125a.75.75 0 01.75-.75h16a.75.75 0 010 1.5h-16a.75.75 0 01-.75-.75z" />
+        </svg>
+      </button>
+
+      <div className="w-px h-6 bg-gray-700 mx-1"></div>
+
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive("heading", { level: 2 })
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Heading"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            fillRule="evenodd"
+            d="M3 6a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
+          />
+        </svg>
+      </button>
+
+      <div className="w-px h-6 bg-gray-700 mx-1"></div>
+
+      <button
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive("bulletList")
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Bullet List"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            fillRule="evenodd"
+            d="M2.625 6.75a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875 0A.75.75 0 018.25 6h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75zM2.625 12a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zM7.5 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12A.75.75 0 017.5 12zm-4.875 5.25a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875 0a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75z"
+          />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive("orderedList")
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Numbered List"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            fillRule="evenodd"
+            d="M8.25 6.75a.75.75 0 01.75-.75h11.25a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zm0 6a.75.75 0 01.75-.75h11.25a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zm0 6a.75.75 0 01.75-.75h11.25a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zM2.5 6.75a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H3.25a.75.75 0 01-.75-.75V6.75zm.75 3a.75.75 0 00-.75.75v.01a.75.75 0 00.75.75H3.25a.75.75 0 00.75-.75V10.5a.75.75 0 00-.75-.75H3.25zm-.75 3.75a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H3.25a.75.75 0 01-.75-.75v-.01zm.75 3a.75.75 0 00-.75.75v.01a.75.75 0 00.75.75H3.25a.75.75 0 00.75-.75V18a.75.75 0 00-.75-.75H3.25z"
+          />
+        </svg>
+      </button>
+
+      <div className="w-px h-6 bg-gray-700 mx-1"></div>
+
+      <button
+        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive({ textAlign: "left" })
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Align Left"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            fillRule="evenodd"
+            d="M3 6a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
+          />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        className={`p-2 rounded-md transition-colors ${
+          editor.isActive({ textAlign: "center" })
+            ? "bg-purple-500/30 text-white"
+            : "text-gray-400 hover:bg-gray-700/50 hover:text-white"
+        }`}
+        title="Align Center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            fillRule="evenodd"
+            d="M3 6a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6zm2.25 5.25a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75zm3 5.25a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75z"
+          />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().chain().focus().undo().run()}
+        className="p-2 rounded-md text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors ml-auto"
+        title="Undo"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            fillRule="evenodd"
+            d="M9.53 2.47a.75.75 0 010 1.06L4.81 8.25H15a6.75 6.75 0 010 13.5h-3a.75.75 0 010-1.5h3a5.25 5.25 0 100-10.5H4.81l4.72 4.72a.75.75 0 11-1.06 1.06l-6-6a.75.75 0 010-1.06l6-6a.75.75 0 011.06 0z"
+          />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().chain().focus().redo().run()}
+        className="p-2 rounded-md text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors"
+        title="Redo"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            fillRule="evenodd"
+            d="M14.47 2.47a.75.75 0 011.06 0l6 6a.75.75 0 010 1.06l-6 6a.75.75 0 11-1.06-1.06l4.72-4.72H9a5.25 5.25 0 100 10.5h3a.75.75 0 010 1.5H9a6.75 6.75 0 010-13.5h10.19l-4.72-4.72a.75.75 0 010-1.06z"
+          />
+        </svg>
+      </button>
+    </div>
+  );
+};
+
 export const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -37,6 +273,34 @@ export const CreatePost = () => {
   const [formStep, setFormStep] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { user } = useAuth();
+
+  // Initialize the editor
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Placeholder.configure({
+        placeholder: "Share your thoughts, story, or description...",
+      }),
+      Image,
+      Color,
+      Highlight,
+    ],
+    content: content,
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML());
+    },
+  });
+
+  // Update editor content when content state changes from outside
+  useEffect(() => {
+    if (editor && content === "") {
+      editor.commands.setContent("");
+    }
+  }, [editor, content]);
 
   // Fetch communities for dropdown
   const { data: communities, isLoading: communitiesLoading } = useQuery({
@@ -251,15 +515,13 @@ export const CreatePost = () => {
                   >
                     Post Content
                   </label>
-                  <textarea
-                    id="content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    required
-                    placeholder="Share your thoughts, story, or description..."
-                    rows={6}
-                    className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-purple-500/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
-                  ></textarea>
+                  <div className="rounded-lg overflow-hidden border border-purple-500/30 bg-gray-800/50 text-white focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-transparent transition-all">
+                    <MenuBar editor={editor} />
+                    <EditorContent
+                      editor={editor}
+                      className="px-4 py-3 min-h-[150px] prose prose-invert prose-sm max-w-none focus:outline-none"
+                    />
+                  </div>
                 </div>
 
                 <div>

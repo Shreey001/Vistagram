@@ -36,3 +36,109 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* TipTap Rich Text Editor Styles */
+.ProseMirror {
+  outline: none;
+  min-height: 150px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #6b7280;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Heading styles */
+.ProseMirror h1 {
+  font-size: 1.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #c084fc, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  color: #ec4899;
+}
+
+/* List styles */
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror li {
+  margin-bottom: 0.25rem;
+}
+
+/* Blockquote styles */
+.ProseMirror blockquote {
+  border-left: 3px solid #8b5cf6;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #9ca3af;
+}
+
+/* Code styles */
+.ProseMirror code {
+  background-color: rgba(139, 92, 246, 0.15);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  color: #ec4899;
+}
+
+/* Text alignment */
+.ProseMirror .text-left {
+  text-align: left;
+}
+
+.ProseMirror .text-center {
+  text-align: center;
+}
+
+.ProseMirror .text-right {
+  text-align: right;
+}
+
+/* Bold, italic, underline */
+.ProseMirror strong {
+  font-weight: 700;
+  color: white;
+}
+
+.ProseMirror em {
+  font-style: italic;
+  color: #c084fc;
+}
+
+.ProseMirror u {
+  text-decoration: underline;
+  text-decoration-color: #8b5cf6;
+  text-decoration-thickness: 2px;
+}
+
+/* Selection styles */
+.ProseMirror ::selection {
+  background: rgba(236, 72, 153, 0.2);
+}
