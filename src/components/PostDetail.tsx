@@ -3,7 +3,7 @@ import { supabase } from "../supabase-client";
 import { Post } from "./PostList";
 import { LikeButton } from "./LikeButton";
 import { CommentSection } from "./CommentSection";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Props {
   postId: number;
@@ -22,19 +22,20 @@ const fetchPostById = async (id: number): Promise<Post> => {
 };
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
 export const PostDetail = ({ postId }: Props) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const postContainerRef = useRef<HTMLDivElement>(null);
 
   const { data, error, isLoading } = useQuery<Post, Error>({
     queryKey: ["post", postId],
@@ -42,7 +43,16 @@ export const PostDetail = ({ postId }: Props) => {
   });
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+      // Scroll to the top of the post when it loads
+      if (postContainerRef.current) {
+        window.scrollTo({
+          top: postContainerRef.current.offsetTop - 20,
+          behavior: "smooth",
+        });
+      }
+    }, 100);
     return () => clearTimeout(timer);
   }, []);
 
@@ -91,7 +101,7 @@ export const PostDetail = ({ postId }: Props) => {
               Oops! Something went wrong
             </h3>
             <p className="text-gray-300 text-sm">{error.message}</p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-medium hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105"
             >
@@ -104,17 +114,26 @@ export const PostDetail = ({ postId }: Props) => {
   }
 
   return (
-    <div 
-      className={`max-w-4xl mx-auto bg-gray-900/30 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-500/20 overflow-hidden transition-all duration-700 hover:shadow-pink-500/20 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+    <div
+      ref={postContainerRef}
+      className={`max-w-4xl mx-auto bg-gray-900/30 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-500/20 overflow-hidden transition-all duration-700 hover:shadow-pink-500/20 transform ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+      }`}
     >
       <div className="relative aspect-video overflow-hidden">
-        <div className={`absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl transition-opacity duration-500 ${imageLoaded ? 'opacity-0' : 'opacity-100'} flex items-center justify-center`}>
+        <div
+          className={`absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl transition-opacity duration-500 ${
+            imageLoaded ? "opacity-0" : "opacity-100"
+          } flex items-center justify-center`}
+        >
           <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
         <img
           src={data?.image_url}
           alt={data?.title}
-          className={`w-full h-full object-cover transition-all duration-1000 ${imageLoaded ? 'scale-100 blur-0' : 'scale-110 blur-sm'}`}
+          className={`w-full h-full object-cover transition-all duration-1000 ${
+            imageLoaded ? "scale-100 blur-0" : "scale-110 blur-sm"
+          }`}
           onLoad={() => setImageLoaded(true)}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent opacity-90"></div>

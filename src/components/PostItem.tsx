@@ -4,9 +4,14 @@ import { motion } from "framer-motion";
 
 interface Props {
   post: Post;
+  compact?: boolean;
 }
 
-export const PostItem = ({ post }: Props) => {
+export const PostItem = ({ post, compact = false }: Props) => {
+  if (compact) {
+    return <CompactPostItem post={post} />;
+  }
+
   return (
     <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 shadow-lg rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-xl h-full flex flex-col">
       <Link to={`/post/${post.id}`} className="flex flex-col h-full">
@@ -123,5 +128,102 @@ export const PostItem = ({ post }: Props) => {
         </div>
       </Link>
     </div>
+  );
+};
+
+const CompactPostItem = ({ post }: { post: Post }) => {
+  return (
+    <motion.div
+      whileHover={{ y: -5 }}
+      className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 shadow-md rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-lg h-full"
+    >
+      <Link to={`/post/${post.id}`} className="block h-full">
+        <div className="relative overflow-hidden aspect-[5/3]">
+          <img
+            src={post.image_url}
+            alt={post.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+
+          {/* Community badge */}
+          {post.communities && (
+            <div className="absolute top-2 right-2 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-full shadow-md">
+              {post.communities.name}
+            </div>
+          )}
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
+
+          {/* Title overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <h2 className="text-sm font-bold text-white line-clamp-2">
+              {post.title}
+            </h2>
+          </div>
+        </div>
+
+        <div className="p-3 flex items-center justify-between">
+          {/* Author info */}
+          <div className="flex items-center gap-2">
+            {post.avatar_url ? (
+              <img
+                src={post.avatar_url}
+                alt="Avatar"
+                className="w-6 h-6 rounded-full object-cover border border-purple-500/50"
+              />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+                {post.user_name
+                  ? post.user_name.charAt(0).toUpperCase()
+                  : post.title.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="text-xs text-gray-400">
+              {new Date(post.created_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+
+          {/* Engagement metrics */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <svg
+                className="w-3 h-3 text-pink-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-pink-400 text-xs">
+                {post.like_count || 0}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <svg
+                className="w-3 h-3 text-purple-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-purple-400 text-xs">
+                {post.comment_count || 0}
+              </span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
 };

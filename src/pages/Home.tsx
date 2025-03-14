@@ -1,8 +1,20 @@
-import { PostList } from "../components/PostList";
 import { CommunitiesList } from "../components/CommunitiesList";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { PostItem } from "../components/PostItem";
+import { supabase } from "../supabase-client";
+import { Post } from "../components/PostList";
+
+// Fetch posts function for homepage
+const fetchPosts = async (): Promise<Post[]> => {
+  const { data, error } = await supabase.rpc("get_posts_with_counts");
+
+  if (error) throw new Error(error.message);
+
+  return data as Post[];
+};
 
 export const Home = () => {
   const { user, signInWithGithub } = useAuth();
@@ -148,13 +160,13 @@ export const Home = () => {
 
       {/* Main Content Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content - Posts */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2 space-y-8"
+            className="lg:col-span-3 space-y-8"
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
@@ -182,7 +194,7 @@ export const Home = () => {
             </div>
 
             <div className="bg-gray-900/30 p-6 rounded-2xl shadow-lg border border-purple-500/20">
-              <PostList />
+              <HomepagePostList />
             </div>
           </motion.div>
 
@@ -225,5 +237,137 @@ export const Home = () => {
         </div>
       </section>
     </div>
+  );
+};
+
+// Custom PostList component for HomePage with compact post items in a grid
+const HomepagePostList = () => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["posts"],
+    queryFn: fetchPosts,
+  });
+
+  if (isLoading)
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="bg-gray-800/30 rounded-xl h-72 animate-pulse"
+            style={{ animationDelay: `${i * 100}ms` }}
+          ></div>
+        ))}
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-8 h-8"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-red-400 mb-2">
+          Error loading posts
+        </h3>
+        <p className="text-gray-300 mb-4">
+          {error instanceof Error ? error.message : "Something went wrong"}
+        </p>
+        <button
+          className="px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 rounded-full text-white font-medium"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
+
+  if (!data || data.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <div className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-8 h-8"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-white mb-2">No posts found</h3>
+        <p className="text-gray-300 mb-6">
+          Be the first to share something amazing with our community!
+        </p>
+        <Link
+          to="/create"
+          className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+          Create Post
+        </Link>
+      </div>
+    );
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: { opacity: 0 },
+        show: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.05,
+          },
+        },
+      }}
+      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
+    >
+      <AnimatePresence>
+        {data.map((post) => (
+          <motion.div
+            key={post.id}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: { opacity: 1, y: 0 },
+            }}
+          >
+            <PostItem post={post} compact={true} />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </motion.div>
   );
 };
