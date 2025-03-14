@@ -6,15 +6,21 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    rollupOptions: {
-      // Force Rollup to use its JavaScript implementation
-      context: 'globalThis',
-    },
-    // Disable using native dependencies
+    // Ensure we're not using native dependencies
     target: 'esnext',
+    // Split chunks for better caching
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['framer-motion', '@tiptap/react', '@tiptap/starter-kit'],
+          'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js']
+        }
+      }
+    }
   },
   optimizeDeps: {
     // Skip optional native dependencies
-    exclude: ['fsevents'],
-  },
+    exclude: ['fsevents']
+  }
 })

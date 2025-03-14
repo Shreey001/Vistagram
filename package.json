@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@rollup/wasm-node": "^4.13.0",
     "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/vite": "^4.0.12",
     "@tanstack/react-query": "^5.67.2",
@@ -45,10 +44,7 @@
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
   },
-  "overrides": {
-    "rollup": "npm:@rollup/wasm-node"
-  },
   "engines": {
-    "node": ">=18"
+    "node": "18.x"
   }
 }
