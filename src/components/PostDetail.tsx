@@ -169,9 +169,6 @@ export const PostDetail = ({ postId }: Props) => {
             <LikeButton postId={postId} />
           </div>
           <div className="border-t border-purple-500/20 pt-8">
-            <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 mb-6">
-              Comments
-            </h3>
             <CommentSection postId={postId} />
           </div>
         </div>
