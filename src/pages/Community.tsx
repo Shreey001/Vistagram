@@ -9,12 +9,12 @@ export const CommunityPage = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="container mx-auto px-4 py-10"
+      className="container mx-auto px-4 py-8"
     >
       <div className="relative">
-        {/* Background decorations */}
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl z-0"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl z-0"></div>
+        {/* Subtle background decorations */}
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-purple-500/5 rounded-full filter blur-3xl z-0"></div>
+        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-pink-500/5 rounded-full filter blur-3xl z-0"></div>
 
         {/* Community display section */}
         <motion.div

@@ -13,7 +13,7 @@ const stripHtmlTags = (html: string): string => {
   return doc.body.textContent || "";
 };
 
-export const PostItem = ({ post, compact = false }: Props) => {
+const PostItem = ({ post, compact = false }: Props) => {
   if (compact) {
     return <CompactPostItem post={post} />;
   }
@@ -144,12 +144,6 @@ export const PostItem = ({ post, compact = false }: Props) => {
 };
 
 const CompactPostItem = ({ post }: { post: Post }) => {
-  // Prepare content for preview
-  const contentPreview =
-    post.content.includes("<") && post.content.includes(">")
-      ? stripHtmlTags(post.content)
-      : post.content;
-
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -245,3 +239,47 @@ const CompactPostItem = ({ post }: { post: Post }) => {
     </motion.div>
   );
 };
+
+// New component for community pages
+const CommunityPostItem = ({ post }: { post: Post }) => {
+  return (
+    <motion.div
+      whileHover={{ y: -5 }}
+      className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 shadow-md rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-lg h-full"
+    >
+      <Link to={`/post/${post.id}`} className="block h-full">
+        <div className="relative overflow-hidden aspect-[5/3]">
+          <img
+            src={post.image_url}
+            alt={post.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          />
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
+
+          {/* Title overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <h2 className="text-sm font-bold text-white line-clamp-2">
+              {post.title}
+            </h2>
+          </div>
+        </div>
+
+        <div className="p-3">
+          {/* Date only */}
+          <div className="flex justify-end">
+            <span className="text-xs text-gray-400">
+              {new Date(post.created_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+};
+
+export { PostItem, CompactPostItem, CommunityPostItem };

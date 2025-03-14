@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Post } from "./PostList";
 import { supabase } from "../supabase-client";
-import { PostItem } from "./PostItem";
-import { motion } from "framer-motion";
+import { CommunityPostItem } from "./PostItem";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 
 interface Props {
@@ -125,13 +125,13 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   return (
     <div className="container mx-auto px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Community Header Section */}
+        {/* Community Header Section - Simplified */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-10"
         >
-          <div className="relative py-16 mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/20">
+          <div className="relative py-12 mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/20">
             {/* Decorative elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20">
               <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-500/50 rounded-full filter blur-3xl"></div>
@@ -139,13 +139,13 @@ export const CommunityDisplay = ({ communityId }: Props) => {
             </div>
 
             <div className="relative z-10 text-center px-6">
-              <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-gradient-to-r from-purple-500/50 to-pink-500/50 border-2 border-white/20">
-                <span className="text-4xl font-bold text-white">
+              <div className="inline-flex items-center justify-center w-20 h-20 mb-5 rounded-full bg-gradient-to-r from-purple-500/50 to-pink-500/50 border-2 border-white/20">
+                <span className="text-3xl font-bold text-white">
                   {communityDetails?.name.charAt(0).toUpperCase()}
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
                 {communityDetails?.name}
               </h1>
 
@@ -155,10 +155,10 @@ export const CommunityDisplay = ({ communityId }: Props) => {
             </div>
           </div>
 
-          {/* Stats and Actions */}
-          <div className="flex flex-wrap justify-center gap-8 mb-12">
-            <div className="flex flex-col items-center bg-white/5 px-8 py-4 rounded-xl border border-purple-500/20">
-              <span className="text-3xl font-bold text-white mb-1">
+          {/* Stats and Actions - Simplified */}
+          <div className="flex flex-wrap justify-center gap-6 mb-10">
+            <div className="flex flex-col items-center bg-white/5 px-6 py-3 rounded-xl border border-purple-500/20">
+              <span className="text-2xl font-bold text-white mb-1">
                 {posts?.length || 0}
               </span>
               <span className="text-gray-400 text-sm">Posts</span>
@@ -166,7 +166,7 @@ export const CommunityDisplay = ({ communityId }: Props) => {
 
             <Link
               to="/create"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-4 rounded-xl text-white font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-xl text-white font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-1"
             >
               <svg
                 className="w-5 h-5"
@@ -181,12 +181,12 @@ export const CommunityDisplay = ({ communityId }: Props) => {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Create Post in {communityDetails?.name}
+              Create Post
             </Link>
           </div>
         </motion.div>
 
-        {/* Posts Section */}
+        {/* Posts Section - Using CommunityPostItem */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,28 +194,29 @@ export const CommunityDisplay = ({ communityId }: Props) => {
         >
           {posts && posts.length > 0 ? (
             <>
-              <h2 className="text-2xl font-bold text-white mb-8 text-center">
+              <h2 className="text-xl font-bold text-white mb-6 text-center">
                 Recent Posts
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {posts.map((post) => (
-                  <motion.div
-                    key={post.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ y: -5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <PostItem post={post} />
-                  </motion.div>
-                ))}
+                <AnimatePresence>
+                  {posts.map((post, index) => (
+                    <motion.div
+                      key={post.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <CommunityPostItem post={post} />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
             </>
           ) : (
-            <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-2xl border border-purple-500/20 p-12 text-center">
-              <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-2xl border border-purple-500/20 p-10 text-center">
+              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-5">
                 <svg
-                  className="w-10 h-10 text-purple-400"
+                  className="w-8 h-8 text-purple-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -228,16 +229,16 @@ export const CommunityDisplay = ({ communityId }: Props) => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">
+              <h3 className="text-xl font-bold text-white mb-3">
                 No Posts Yet
               </h3>
-              <p className="text-gray-300 mb-8 max-w-md mx-auto">
+              <p className="text-gray-300 mb-6 max-w-md mx-auto">
                 Be the first to share content in the {communityDetails?.name}{" "}
                 community!
               </p>
               <Link
                 to="/create"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-lg text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-lg text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-1"
               >
                 <svg
                   className="w-5 h-5"

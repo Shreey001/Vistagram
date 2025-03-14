@@ -6,38 +6,38 @@ export const CreatePostPage = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-3xl mx-auto py-10 px-4"
+      transition={{ duration: 0.4 }}
+      className="max-w-3xl mx-auto py-8 px-4"
     >
       <div className="relative">
-        {/* Background decorations */}
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-500/10 rounded-full filter blur-3xl z-0"></div>
-        <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-pink-500/20 rounded-full filter blur-3xl z-0"></div>
+        {/* Subtle background decorations */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-500/5 rounded-full filter blur-3xl z-0"></div>
+        <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-pink-500/10 rounded-full filter blur-3xl z-0"></div>
 
         {/* Content with glass effect */}
-        <div className="relative z-10 bg-gradient-to-br from-gray-900/80 to-gray-800/50 backdrop-blur-sm shadow-xl rounded-2xl border border-purple-500/20 overflow-hidden">
+        <div className="relative z-10 bg-gradient-to-br from-gray-900/80 to-gray-800/50 backdrop-blur-sm shadow-lg rounded-xl border border-purple-500/20 overflow-hidden">
           {/* Decorative top bar */}
-          <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+          <div className="h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
 
-          <div className="p-8">
+          <div className="p-6">
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-center mb-10"
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="text-center mb-8"
             >
-              <h2 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+              <h2 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
                 Create New Post
               </h2>
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-sm">
                 Share your amazing content with our community
               </p>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
             >
               <CreatePost />
             </motion.div>
