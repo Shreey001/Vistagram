@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "ROLLUP_NATIVE_DISABLE=1 tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -14,15 +14,15 @@
     "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/vite": "^4.0.12",
     "@tanstack/react-query": "^5.67.2",
-    "@tiptap/extension-color": "^2.11.5",
-    "@tiptap/extension-highlight": "^2.11.5",
-    "@tiptap/extension-image": "^2.11.5",
-    "@tiptap/extension-placeholder": "^2.11.5",
-    "@tiptap/extension-text-align": "^2.11.5",
-    "@tiptap/extension-underline": "^2.11.5",
-    "@tiptap/pm": "^2.11.5",
-    "@tiptap/react": "^2.11.5",
-    "@tiptap/starter-kit": "^2.11.5",
+    "@tiptap/extension-color": "^2.2.4",
+    "@tiptap/extension-highlight": "^2.2.4",
+    "@tiptap/extension-image": "^2.2.4",
+    "@tiptap/extension-placeholder": "^2.2.4",
+    "@tiptap/extension-text-align": "^2.2.4",
+    "@tiptap/extension-underline": "^2.2.4",
+    "@tiptap/pm": "^2.2.4",
+    "@tiptap/react": "^2.2.4",
+    "@tiptap/starter-kit": "^2.2.4",
     "framer-motion": "^12.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/typography": "^0.5.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
@@ -47,5 +47,8 @@
   },
   "overrides": {
     "rollup": "npm:@rollup/wasm-node"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
