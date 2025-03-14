@@ -1,6 +1,7 @@
 import { PostList } from "../components/PostList";
+import { CommunitiesList } from "../components/CommunitiesList";
 import { motion } from "framer-motion";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export const Home = () => {
@@ -145,43 +146,83 @@ export const Home = () => {
         </div>
       </motion.section>
 
-      {/* Recent Posts Section */}
+      {/* Main Content Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="space-y-4"
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
-              Recent Posts
-            </h2>
-            <Link
-              to="/create"
-              className="hidden sm:flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-white rounded-full border border-purple-500/30 hover:border-pink-500/50 transition-all duration-300"
-            >
-              <span>Create Post</span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content - Posts */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2 space-y-8"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+                Recent Posts
+              </h2>
+              <Link
+                to="/create"
+                className="hidden sm:flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-white rounded-full border border-purple-500/30 hover:border-pink-500/50 transition-all duration-300"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </Link>
-          </div>
+                <span>Create Post</span>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </Link>
+            </div>
 
-          <div className="bg-gray-900/30 p-6 rounded-2xl shadow-lg border border-purple-500/20">
-            <PostList />
-          </div>
-        </motion.div>
+            <div className="bg-gray-900/30 p-6 rounded-2xl shadow-lg border border-purple-500/20">
+              <PostList />
+            </div>
+          </motion.div>
+
+          {/* Sidebar - Communities */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="space-y-8"
+          >
+            <CommunitiesList />
+
+            {/* Additional sidebar content */}
+            <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl border border-purple-500/20 p-6">
+              <h2 className="text-xl font-bold text-white mb-4">
+                Join Vistagram
+              </h2>
+              <p className="text-gray-300 mb-4">
+                Create an account to post your own visual stories and join
+                communities.
+              </p>
+              {!user && (
+                <button
+                  onClick={signInWithGithub}
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-pink-500/25"
+                >
+                  Sign Up Now
+                </button>
+              )}
+              {user && (
+                <Link
+                  to="/create"
+                  className="block w-full py-3 text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-pink-500/25"
+                >
+                  Create Post
+                </Link>
+              )}
+            </div>
+          </motion.div>
+        </div>
       </section>
     </div>
   );

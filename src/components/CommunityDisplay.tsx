@@ -7,15 +7,10 @@ import { motion } from "framer-motion";
 interface Props {
   communityId: number;
 }
-interface PostWithCommunity extends Post {
-  communities: {
-    name: string;
-  };
-}
 
 export const fetchCommunityPost = async (
   communityId: number
-): Promise<PostWithCommunity[]> => {
+): Promise<Post[]> => {
   const { data, error } = await supabase
     .from("posts")
     .select("*,communities(name)")
@@ -23,11 +18,11 @@ export const fetchCommunityPost = async (
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
-  return data as PostWithCommunity[];
+  return data as Post[];
 };
 
 export const CommunityDisplay = ({ communityId }: Props) => {
-  const { data, error, isLoading } = useQuery<PostWithCommunity[], Error>({
+  const { data, error, isLoading } = useQuery<Post[], Error>({
     queryKey: ["communityPosts", communityId],
     queryFn: () => fetchCommunityPost(Number(communityId)),
   });
