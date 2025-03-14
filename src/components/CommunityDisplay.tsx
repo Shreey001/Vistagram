@@ -61,20 +61,20 @@ export const CommunityDisplay = ({ communityId }: Props) => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-3 sm:px-4">
         <div className="max-w-6xl mx-auto">
           {/* Loading header */}
-          <div className="animate-pulse mb-10">
-            <div className="h-12 bg-purple-500/20 rounded-lg w-3/4 mx-auto mb-4"></div>
-            <div className="h-6 bg-gray-700/50 rounded-lg w-1/2 mx-auto"></div>
+          <div className="animate-pulse mb-6 sm:mb-10">
+            <div className="h-10 sm:h-12 bg-purple-500/20 rounded-lg w-full sm:w-3/4 mx-auto mb-3 sm:mb-4"></div>
+            <div className="h-5 sm:h-6 bg-gray-700/50 rounded-lg w-2/3 sm:w-1/2 mx-auto"></div>
           </div>
 
           {/* Loading posts grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="bg-gray-800/30 rounded-xl h-72 animate-pulse"
+                className="bg-gray-800/30 rounded-xl h-60 sm:h-72 animate-pulse"
                 style={{ animationDelay: `${i * 100}ms` }}
               ></div>
             ))}
@@ -123,53 +123,53 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   }
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-3 sm:px-4">
       <div className="max-w-6xl mx-auto">
         {/* Community Header Section - Simplified */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10"
+          className="mb-6 sm:mb-10"
         >
-          <div className="relative py-12 mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/20">
+          <div className="relative py-8 sm:py-12 mb-6 sm:mb-8 overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/20">
             {/* Decorative elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20">
-              <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-500/50 rounded-full filter blur-3xl"></div>
-              <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-pink-500/50 rounded-full filter blur-3xl"></div>
+              <div className="absolute -top-20 -left-20 w-48 sm:w-64 h-48 sm:h-64 bg-purple-500/50 rounded-full filter blur-3xl"></div>
+              <div className="absolute -bottom-20 -right-20 w-48 sm:w-64 h-48 sm:h-64 bg-pink-500/50 rounded-full filter blur-3xl"></div>
             </div>
 
-            <div className="relative z-10 text-center px-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 mb-5 rounded-full bg-gradient-to-r from-purple-500/50 to-pink-500/50 border-2 border-white/20">
-                <span className="text-3xl font-bold text-white">
+            <div className="relative z-10 text-center px-4 sm:px-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-5 rounded-full bg-gradient-to-r from-purple-500/50 to-pink-500/50 border-2 border-white/20">
+                <span className="text-2xl sm:text-3xl font-bold text-white">
                   {communityDetails?.name.charAt(0).toUpperCase()}
                 </span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
                 {communityDetails?.name}
               </h1>
 
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              <p className="text-gray-300 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
                 {communityDetails?.description || "Welcome to our community!"}
               </p>
             </div>
           </div>
 
           {/* Stats and Actions - Simplified */}
-          <div className="flex flex-wrap justify-center gap-6 mb-10">
-            <div className="flex flex-col items-center bg-white/5 px-6 py-3 rounded-xl border border-purple-500/20">
-              <span className="text-2xl font-bold text-white mb-1">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-6 sm:mb-10">
+            <div className="flex flex-col items-center bg-white/5 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-purple-500/20">
+              <span className="text-xl sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">
                 {posts?.length || 0}
               </span>
-              <span className="text-gray-400 text-sm">Posts</span>
+              <span className="text-gray-400 text-xs sm:text-sm">Posts</span>
             </div>
 
             <Link
               to="/create"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-xl text-white font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-1"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-4 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl text-white text-sm sm:text-base font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-1"
             >
               <svg
-                className="w-5 h-5"
+                className="w-4 h-4 sm:w-5 sm:h-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -194,10 +194,10 @@ export const CommunityDisplay = ({ communityId }: Props) => {
         >
           {posts && posts.length > 0 ? (
             <>
-              <h2 className="text-xl font-bold text-white mb-6 text-center">
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 text-center">
                 Recent Posts
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <AnimatePresence>
                   {posts.map((post, index) => (
                     <motion.div
@@ -213,10 +213,10 @@ export const CommunityDisplay = ({ communityId }: Props) => {
               </div>
             </>
           ) : (
-            <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-2xl border border-purple-500/20 p-10 text-center">
-              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-5">
+            <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-xl sm:rounded-2xl border border-purple-500/20 p-6 sm:p-10 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
                 <svg
-                  className="w-8 h-8 text-purple-400"
+                  className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -229,19 +229,19 @@ export const CommunityDisplay = ({ communityId }: Props) => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">
                 No Posts Yet
               </h3>
-              <p className="text-gray-300 mb-6 max-w-md mx-auto">
+              <p className="text-gray-300 mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
                 Be the first to share content in the {communityDetails?.name}{" "}
                 community!
               </p>
               <Link
                 to="/create"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-lg text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-1"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 px-4 sm:px-5 py-2 sm:py-3 rounded-lg text-white text-sm sm:text-base font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-1"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

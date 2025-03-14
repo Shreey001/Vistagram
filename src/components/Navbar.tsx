@@ -1,6 +1,6 @@
-import { Link, NavLink as RouterNavLink } from "react-router-dom";
+import { Link, NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import logo from "../assets/logo.svg";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -8,8 +8,16 @@ export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, signInWithGithub, signOut } = useAuth();
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const location = useLocation();
 
   const displayName = user?.user_metadata.user_name || user?.email;
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +26,41 @@ export const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        menuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        menuButtonRef.current &&
+        !menuButtonRef.current.contains(event.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   return (
     <motion.nav
@@ -196,6 +239,7 @@ export const Navbar = () => {
           {/* mobile menu button */}
           <motion.div className="md:hidden" whileTap={{ scale: 0.95 }}>
             <button
+              ref={menuButtonRef}
               onClick={() => setMenuOpen((prev) => !prev)}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors"
             >
@@ -231,6 +275,7 @@ export const Navbar = () => {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            ref={mobileMenuRef}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -238,7 +283,7 @@ export const Navbar = () => {
             className="md:hidden bg-gray-900/95 backdrop-blur-xl border-b border-white/5"
           >
             <div className="px-4 py-5 space-y-4">
-              <MobileNavLink to="/">
+              <MobileNavLink to="/" onClick={() => setMenuOpen(false)}>
                 <svg
                   className="w-5 h-5 mr-3"
                   fill="none"
@@ -254,7 +299,7 @@ export const Navbar = () => {
                 </svg>
                 Home
               </MobileNavLink>
-              <MobileNavLink to="/create">
+              <MobileNavLink to="/create" onClick={() => setMenuOpen(false)}>
                 <svg
                   className="w-5 h-5 mr-3"
                   fill="none"
@@ -270,7 +315,10 @@ export const Navbar = () => {
                 </svg>
                 Create Post
               </MobileNavLink>
-              <MobileNavLink to="/communities">
+              <MobileNavLink
+                to="/communities"
+                onClick={() => setMenuOpen(false)}
+              >
                 <svg
                   className="w-5 h-5 mr-3"
                   fill="none"
@@ -286,7 +334,10 @@ export const Navbar = () => {
                 </svg>
                 Communities
               </MobileNavLink>
-              <MobileNavLink to="/community/create">
+              <MobileNavLink
+                to="/community/create"
+                onClick={() => setMenuOpen(false)}
+              >
                 <svg
                   className="w-5 h-5 mr-3"
                   fill="none"
@@ -302,7 +353,7 @@ export const Navbar = () => {
                 </svg>
                 Create Community
               </MobileNavLink>
-              <MobileNavLink to="/about">
+              <MobileNavLink to="/about" onClick={() => setMenuOpen(false)}>
                 <svg
                   className="w-5 h-5 mr-3"
                   fill="none"
@@ -407,9 +458,11 @@ const NavLink = ({
 const MobileNavLink = ({
   to,
   children,
+  onClick,
 }: {
   to: string;
   children: React.ReactNode;
+  onClick?: () => void;
 }) => (
   <RouterNavLink
     to={to}
@@ -420,6 +473,7 @@ const MobileNavLink = ({
           : "text-gray-300 hover:bg-white/5 hover:text-white"
       }`
     }
+    onClick={onClick}
   >
     {children}
   </RouterNavLink>

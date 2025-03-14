@@ -25,29 +25,29 @@ const PostItem = ({ post, compact = false }: Props) => {
       : post.content;
 
   return (
-    <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 shadow-lg rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-xl h-full flex flex-col">
+    <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 shadow-lg rounded-lg sm:rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-xl h-full flex flex-col">
       <Link to={`/post/${post.id}`} className="flex flex-col h-full">
         {/* Image banner */}
         <div className="relative group overflow-hidden">
           <img
             src={post.image_url}
             alt={post.title}
-            className="w-full h-52 object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-40 sm:h-52 object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
           {/* Floating badge for community if available */}
           {post.communities && (
-            <div className="absolute top-3 right-3 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full shadow-lg">
+            <div className="absolute top-2 right-2 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-full shadow-lg">
               {post.communities.name}
             </div>
           )}
         </div>
 
-        <div className="p-5 flex-grow flex flex-col">
+        <div className="p-3 sm:p-5 flex-grow flex flex-col">
           {/* Header: Title and Date */}
-          <div className="mb-3">
-            <h2 className="text-xl font-bold text-white group-hover:text-pink-400 transition-colors line-clamp-2">
+          <div className="mb-2 sm:mb-3">
+            <h2 className="text-lg sm:text-xl font-bold text-white group-hover:text-pink-400 transition-colors line-clamp-2">
               {post.title}
             </h2>
             <p className="text-xs text-gray-400 mt-1">
@@ -60,41 +60,41 @@ const PostItem = ({ post, compact = false }: Props) => {
           </div>
 
           {/* Content preview */}
-          <p className="text-sm text-gray-300 line-clamp-3 mb-4 flex-grow">
+          <p className="text-xs sm:text-sm text-gray-300 line-clamp-3 mb-3 sm:mb-4 flex-grow">
             {contentPreview}
           </p>
 
           {/* Author info */}
-          <div className="flex items-center gap-3 mt-auto border-t border-purple-500/10 pt-4">
+          <div className="flex items-center gap-2 sm:gap-3 mt-auto border-t border-purple-500/10 pt-3 sm:pt-4">
             {post.avatar_url ? (
               <img
                 src={post.avatar_url}
                 alt="Avatar"
-                className="w-8 h-8 rounded-full object-cover border border-purple-500/50"
+                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover border border-purple-500/50"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                 {post.user_name
                   ? post.user_name.charAt(0).toUpperCase()
                   : post.title.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="text-sm text-gray-300">
+            <div className="text-xs sm:text-sm text-gray-300">
               {post.user_name || "Anonymous"}
             </div>
           </div>
         </div>
 
         {/* Engagement Metrics */}
-        <div className="px-5 py-3 bg-black/20 border-t border-purple-500/10">
+        <div className="px-3 sm:px-5 py-2 sm:py-3 bg-black/20 border-t border-purple-500/10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-1.5 bg-pink-500/10 px-2.5 py-1 rounded-full"
+                className="flex items-center gap-1 sm:gap-1.5 bg-pink-500/10 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
               >
                 <svg
-                  className="w-4 h-4 text-pink-400"
+                  className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -111,10 +111,10 @@ const PostItem = ({ post, compact = false }: Props) => {
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-1.5 bg-purple-500/10 px-2.5 py-1 rounded-full"
+                className="flex items-center gap-1 sm:gap-1.5 bg-purple-500/10 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
               >
                 <svg
-                  className="w-4 h-4 text-purple-400"
+                  className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -132,7 +132,7 @@ const PostItem = ({ post, compact = false }: Props) => {
 
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="text-xs font-medium text-white bg-gradient-to-r from-purple-500/20 to-pink-500/20 px-3 py-1 rounded-full"
+              className="text-xs font-medium text-white bg-gradient-to-r from-purple-500/20 to-pink-500/20 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full"
             >
               Read More
             </motion.div>
@@ -147,7 +147,7 @@ const CompactPostItem = ({ post }: { post: Post }) => {
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 shadow-md rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-lg h-full"
+      className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 shadow-md rounded-lg sm:rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-lg h-full"
     >
       <Link to={`/post/${post.id}`} className="block h-full">
         <div className="relative overflow-hidden aspect-[5/3]">
@@ -159,7 +159,7 @@ const CompactPostItem = ({ post }: { post: Post }) => {
 
           {/* Community badge */}
           {post.communities && (
-            <div className="absolute top-2 right-2 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-full shadow-md">
+            <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-1.5 sm:px-2 py-0.5 rounded-full shadow-md">
               {post.communities.name}
             </div>
           )}
@@ -168,24 +168,24 @@ const CompactPostItem = ({ post }: { post: Post }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
 
           {/* Title overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <h2 className="text-sm font-bold text-white line-clamp-2">
+          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
+            <h2 className="text-xs sm:text-sm font-bold text-white line-clamp-2">
               {post.title}
             </h2>
           </div>
         </div>
 
-        <div className="p-3 flex items-center justify-between">
+        <div className="p-2 sm:p-3 flex items-center justify-between">
           {/* Author info */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {post.avatar_url ? (
               <img
                 src={post.avatar_url}
                 alt="Avatar"
-                className="w-6 h-6 rounded-full object-cover border border-purple-500/50"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-purple-500/50"
               />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
                 {post.user_name
                   ? post.user_name.charAt(0).toUpperCase()
                   : post.title.charAt(0).toUpperCase()}
@@ -200,10 +200,10 @@ const CompactPostItem = ({ post }: { post: Post }) => {
           </div>
 
           {/* Engagement metrics */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <svg
-                className="w-3 h-3 text-pink-400"
+                className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-pink-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -217,9 +217,9 @@ const CompactPostItem = ({ post }: { post: Post }) => {
                 {post.like_count || 0}
               </span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <svg
-                className="w-3 h-3 text-purple-400"
+                className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -245,7 +245,7 @@ const CommunityPostItem = ({ post }: { post: Post }) => {
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 shadow-md rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-lg h-full"
+      className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 shadow-md rounded-lg sm:rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-lg h-full"
     >
       <Link to={`/post/${post.id}`} className="block h-full">
         <div className="relative overflow-hidden aspect-[5/3]">
@@ -259,14 +259,14 @@ const CommunityPostItem = ({ post }: { post: Post }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
 
           {/* Title overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <h2 className="text-sm font-bold text-white line-clamp-2">
+          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
+            <h2 className="text-xs sm:text-sm font-bold text-white line-clamp-2">
               {post.title}
             </h2>
           </div>
         </div>
 
-        <div className="p-3">
+        <div className="p-2 sm:p-3">
           {/* Date only */}
           <div className="flex justify-end">
             <span className="text-xs text-gray-400">
