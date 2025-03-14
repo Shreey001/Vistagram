@@ -1,4 +1,4 @@
-import { Link, NavLink as RouterNavLink } from "react-router-dom";
+import { Link } from "react-router";
 import logo from "../assets/logo.svg";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -154,16 +154,12 @@ const NavLink = ({
   to: string;
   children: React.ReactNode;
 }) => (
-  <RouterNavLink
+  <Link
     to={to}
-    className={({ isActive }) =>
-      `text-gray-300 hover:text-white font-medium px-4 py-2 rounded-lg ${
-        isActive ? "bg-white/10 text-white" : "hover:bg-white/10"
-      } transition-all duration-300`
-    }
+    className="text-gray-300 hover:text-white font-medium px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-300"
   >
     {children}
-  </RouterNavLink>
+  </Link>
 );
 
 const MobileNavLink = ({
@@ -173,14 +169,10 @@ const MobileNavLink = ({
   to: string;
   children: React.ReactNode;
 }) => (
-  <RouterNavLink
+  <Link
     to={to}
-    className={({ isActive }) =>
-      `block px-3 py-2 rounded-md text-base font-medium ${
-        isActive ? "bg-white/10 text-white" : "text-gray-300 hover:bg-white/10"
-      } transition-all duration-300`
-    }
+    className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-white/10 transition-all duration-300"
   >
     {children}
-  </RouterNavLink>
+  </Link>
 );
