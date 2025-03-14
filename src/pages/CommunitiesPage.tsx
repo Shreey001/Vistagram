@@ -20,7 +20,7 @@ export const CommunitiesPage = () => {
           animate={{ y: 0, opacity: 1 }}
           className="relative z-10 text-center mb-12"
         >
-          <h2 className="text-6xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+          <h2 className="text-5xl sm:text-6xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
             Communities
           </h2>
           <p className="text-gray-300 text-lg max-w-3xl mx-auto mb-8">
@@ -35,7 +35,7 @@ export const CommunitiesPage = () => {
           >
             <Link
               to="/community/create"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -55,14 +55,9 @@ export const CommunitiesPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="relative z-10 bg-gradient-to-br from-gray-900/80 to-gray-800/50 backdrop-blur-sm shadow-xl rounded-2xl border border-purple-500/20 overflow-hidden"
+          className="relative z-10"
         >
-          {/* Decorative top bar */}
-          <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500"></div>
-
-          <div className="p-6">
-            <CommunityList />
-          </div>
+          <CommunityList />
         </motion.div>
       </div>
     </motion.div>
