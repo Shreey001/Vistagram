@@ -72,25 +72,27 @@ export const Navbar = () => {
           : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
+          {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <motion.img
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
-              className="w-12 h-12 rounded-full border-2 border-transparent group-hover:border-pink-500 transition-all duration-300"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-transparent group-hover:border-pink-500 transition-all duration-300"
               src={logo}
               alt="logo"
             />
-            <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+            <span className="text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
               Vistagram
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-3">
             <NavLink to="/">
               <svg
-                className="w-4 h-4 mr-1"
+                className="w-4 h-4 mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -106,7 +108,7 @@ export const Navbar = () => {
             </NavLink>
             <NavLink to="/create">
               <svg
-                className="w-4 h-4 mr-1"
+                className="w-4 h-4 mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -124,15 +126,15 @@ export const Navbar = () => {
               <RouterNavLink
                 to="/communities"
                 className={({ isActive }) =>
-                  `flex items-center ${
+                  `flex items-center px-4 py-2 rounded-lg ${
                     isActive
-                      ? "text-purple-400"
-                      : "text-gray-300 hover:text-white"
+                      ? "bg-white/10 text-purple-400"
+                      : "text-gray-300 hover:bg-white/5 hover:text-white"
                   }`
                 }
               >
                 <svg
-                  className="w-4 h-4 mr-1"
+                  className="w-4 h-4 mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -146,17 +148,17 @@ export const Navbar = () => {
                 </svg>
                 Communities
               </RouterNavLink>
-              <div className="absolute left-0 mt-2 w-48 bg-gray-900 rounded-lg shadow-lg border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                <div className="py-1">
+              <div className="absolute left-0 mt-2 w-56 bg-gray-900/95 backdrop-blur-md rounded-lg shadow-lg border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                <div className="py-2">
                   <Link
                     to="/communities"
-                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
+                    className="block px-5 py-3 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                   >
                     Browse Communities
                   </Link>
                   <Link
                     to="/community/create"
-                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
+                    className="block px-5 py-3 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                   >
                     Create Community
                   </Link>
@@ -165,7 +167,7 @@ export const Navbar = () => {
             </div>
             <NavLink to="/about">
               <svg
-                className="w-4 h-4 mr-1"
+                className="w-4 h-4 mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -181,7 +183,7 @@ export const Navbar = () => {
             </NavLink>
           </div>
 
-          {/* desktop auth */}
+          {/* Desktop Auth */}
           <div className="hidden md:flex items-center">
             {user ? (
               <motion.div
@@ -189,7 +191,7 @@ export const Navbar = () => {
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center space-x-4"
               >
-                <div className="flex items-center space-x-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+                <div className="flex items-center space-x-3 px-4 py-2 bg-white/5 rounded-full border border-white/10">
                   {user.user_metadata.avatar_url && (
                     <motion.img
                       whileHover={{ scale: 1.1 }}
@@ -206,7 +208,7 @@ export const Navbar = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={signOut}
-                  className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium px-4 py-2 rounded-full transition-all duration-300 text-sm flex items-center gap-2"
+                  className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium px-5 py-2 rounded-full transition-all duration-300 text-sm flex items-center gap-2"
                 >
                   <svg
                     className="w-4 h-4"
@@ -236,7 +238,7 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* mobile menu button */}
+          {/* Mobile Menu Button */}
           <motion.div className="md:hidden" whileTap={{ scale: 0.95 }}>
             <button
               ref={menuButtonRef}
@@ -245,7 +247,7 @@ export const Navbar = () => {
             >
               <motion.svg
                 animate={{ rotate: menuOpen ? 180 : 0 }}
-                className="w-6 h-6 text-gray-300"
+                className="w-7 h-7 text-gray-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -271,7 +273,7 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* mobile menu */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -282,7 +284,7 @@ export const Navbar = () => {
             transition={{ duration: 0.3 }}
             className="md:hidden bg-gray-900/95 backdrop-blur-xl border-b border-white/5"
           >
-            <div className="px-4 py-5 space-y-4">
+            <div className="px-4 py-6 space-y-5">
               <MobileNavLink to="/" onClick={() => setMenuOpen(false)}>
                 <svg
                   className="w-5 h-5 mr-3"
@@ -370,11 +372,11 @@ export const Navbar = () => {
                 About Us
               </MobileNavLink>
 
-              {/* Mobile auth */}
-              <div className="pt-4 border-t border-white/10">
+              {/* Mobile Auth */}
+              <div className="pt-5 mt-5 border-t border-white/10">
                 {user ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
                       {user.user_metadata.avatar_url && (
                         <img
                           src={user.user_metadata.avatar_url}
@@ -387,8 +389,11 @@ export const Navbar = () => {
                       </span>
                     </div>
                     <button
-                      onClick={signOut}
-                      className="w-full flex items-center justify-center space-x-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium py-2 px-4 rounded-lg transition-colors"
+                      onClick={() => {
+                        signOut();
+                        setMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-center space-x-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium py-3 px-4 rounded-lg transition-colors"
                     >
                       <svg
                         className="w-5 h-5"
@@ -408,7 +413,10 @@ export const Navbar = () => {
                   </div>
                 ) : (
                   <button
-                    onClick={signInWithGithub}
+                    onClick={() => {
+                      signInWithGithub();
+                      setMenuOpen(false);
+                    }}
                     className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-all duration-300"
                   >
                     <svg
@@ -444,7 +452,7 @@ const NavLink = ({
   <RouterNavLink
     to={to}
     className={({ isActive }) =>
-      `flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+      `flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
         isActive
           ? "bg-white/10 text-white"
           : "text-gray-300 hover:bg-white/5 hover:text-white"
@@ -467,7 +475,7 @@ const MobileNavLink = ({
   <RouterNavLink
     to={to}
     className={({ isActive }) =>
-      `flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 ${
+      `flex items-center px-5 py-3 rounded-lg text-base font-medium transition-all duration-300 ${
         isActive
           ? "bg-white/10 text-white"
           : "text-gray-300 hover:bg-white/5 hover:text-white"
