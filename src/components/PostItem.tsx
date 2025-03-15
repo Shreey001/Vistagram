@@ -150,7 +150,7 @@ const CompactPostItem = ({ post }: { post: Post }) => {
       className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 shadow-md rounded-lg sm:rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-lg h-full"
     >
       <Link to={`/post/${post.id}`} className="block h-full">
-        <div className="relative overflow-hidden aspect-[5/3]">
+        <div className="relative overflow-hidden aspect-[5/2]">
           <img
             src={post.image_url}
             alt={post.title}
@@ -159,7 +159,7 @@ const CompactPostItem = ({ post }: { post: Post }) => {
 
           {/* Community badge */}
           {post.communities && (
-            <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-1.5 sm:px-2 py-0.5 rounded-full shadow-md">
+            <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow-md">
               {post.communities.name}
             </div>
           )}
@@ -168,30 +168,30 @@ const CompactPostItem = ({ post }: { post: Post }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
 
           {/* Title overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
-            <h2 className="text-xs sm:text-sm font-bold text-white line-clamp-2">
+          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
+            <h2 className="text-sm sm:text-base font-bold text-white line-clamp-2">
               {post.title}
             </h2>
           </div>
         </div>
 
-        <div className="p-2 sm:p-3 flex items-center justify-between">
+        <div className="p-3 sm:p-4 flex items-center justify-between">
           {/* Author info */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             {post.avatar_url ? (
               <img
                 src={post.avatar_url}
                 alt="Avatar"
-                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-purple-500/50"
+                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-purple-500/50"
               />
             ) : (
-              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
                 {post.user_name
                   ? post.user_name.charAt(0).toUpperCase()
                   : post.title.charAt(0).toUpperCase()}
               </div>
             )}
-            <span className="text-xs text-gray-400">
+            <span className="text-xs sm:text-sm text-gray-400">
               {new Date(post.created_at).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -200,10 +200,10 @@ const CompactPostItem = ({ post }: { post: Post }) => {
           </div>
 
           {/* Engagement metrics */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="flex items-center gap-0.5 sm:gap-1">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <svg
-                className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-pink-400"
+                className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -213,13 +213,13 @@ const CompactPostItem = ({ post }: { post: Post }) => {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-pink-400 text-xs">
+              <span className="text-pink-400 text-xs sm:text-sm">
                 {post.like_count || 0}
               </span>
             </div>
-            <div className="flex items-center gap-0.5 sm:gap-1">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <svg
-                className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-400"
+                className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -229,7 +229,7 @@ const CompactPostItem = ({ post }: { post: Post }) => {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-purple-400 text-xs">
+              <span className="text-purple-400 text-xs sm:text-sm">
                 {post.comment_count || 0}
               </span>
             </div>
