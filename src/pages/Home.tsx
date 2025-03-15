@@ -94,7 +94,7 @@ export const Home = () => {
                   {user ? (
                     <Link to="/create">Start Creating</Link>
                   ) : (
-                    <span onClick={signInWithGithub}>Join Now</span>
+                    <Link to="/login">Join Now</Link>
                   )}
                 </motion.button>
 
