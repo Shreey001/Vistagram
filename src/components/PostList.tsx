@@ -29,11 +29,19 @@ export interface Post {
   comment_count?: number;
   like_count?: number;
   user_name?: string;
-  communities?: {
-    id: number;
-    name: string;
-    description?: string;
-  };
+  community_id?: number;
+  community_name?: string;
+  communities?:
+    | {
+        id: number;
+        name: string;
+        description?: string;
+      }
+    | Array<{
+        id: number;
+        name: string;
+        description?: string;
+      }>;
 }
 
 const fetchPosts = async (): Promise<Post[]> => {

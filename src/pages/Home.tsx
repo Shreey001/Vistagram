@@ -19,8 +19,10 @@ const fetchPosts = async (): Promise<Post[]> => {
 
 export const Home = () => {
   const { user, signInWithGithub } = useAuth();
-  const [selectedCommunity, setSelectedCommunity] = useState<number | null>(null);
-  
+  const [selectedCommunity, setSelectedCommunity] = useState<number | null>(
+    null
+  );
+
   // Fetch all communities for the filter
   const { data: communities, isLoading: communitiesLoading } = useQuery({
     queryKey: ["home-communities"],
@@ -222,22 +224,28 @@ export const Home = () => {
                   </Link>
                 </div>
               </div>
-              
+
               {/* Community Filter - Redesigned */}
               <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
                 <button
                   onClick={() => setSelectedCommunity(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${!selectedCommunity 
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' 
-                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/70'}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                    !selectedCommunity
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
+                      : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
+                  }`}
                 >
                   All Communities
                 </button>
-                
+
                 {communitiesLoading ? (
                   <div className="flex gap-2">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className="animate-pulse bg-gray-700 h-9 w-28 rounded-full" style={{ animationDelay: `${i * 100}ms` }}></div>
+                      <div
+                        key={i}
+                        className="animate-pulse bg-gray-700 h-9 w-28 rounded-full"
+                        style={{ animationDelay: `${i * 100}ms` }}
+                      ></div>
                     ))}
                   </div>
                 ) : (
@@ -245,9 +253,11 @@ export const Home = () => {
                     <button
                       key={community.id}
                       onClick={() => setSelectedCommunity(community.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${selectedCommunity === community.id 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' 
-                        : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/70'}`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                        selectedCommunity === community.id
+                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
+                          : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
+                      }`}
                     >
                       {community.name}
                     </button>
@@ -292,44 +302,42 @@ export const Home = () => {
                 </svg>
               </Link>
             </div>
-            
+
             {/* Horizontal Communities Display */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {communitiesLoading ? (
-                // Loading skeleton
-                [...Array(5)].map((_, i) => (
-                  <div 
-                    key={i} 
-                    className="bg-gray-800/50 rounded-lg p-4 animate-pulse flex flex-col items-center"
-                    style={{ animationDelay: `${i * 100}ms` }}
-                  >
-                    <div className="w-12 h-12 bg-gray-700 rounded-full mb-3"></div>
-                    <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-700/50 rounded w-1/2"></div>
-                  </div>
-                ))
-              ) : (
-                communities?.slice(0, 10).map((community) => (
-                  <Link
-                    key={community.id}
-                    to={`/community/${community.id}`}
-                    className="bg-gray-800/50 hover:bg-gray-800/80 rounded-lg p-4 flex flex-col items-center transition-all duration-300 border border-transparent hover:border-purple-500/30 group"
-                  >
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-full flex items-center justify-center mb-3 group-hover:from-purple-500/50 group-hover:to-pink-500/50 transition-all duration-300">
-                      <span className="text-xl font-bold text-white">
-                        {community.name.charAt(0).toUpperCase()}
-                      </span>
+              {communitiesLoading
+                ? // Loading skeleton
+                  [...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-gray-800/50 rounded-lg p-4 animate-pulse flex flex-col items-center"
+                      style={{ animationDelay: `${i * 100}ms` }}
+                    >
+                      <div className="w-12 h-12 bg-gray-700 rounded-full mb-3"></div>
+                      <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-700/50 rounded w-1/2"></div>
                     </div>
-                    <h3 className="font-medium text-white group-hover:text-purple-400 transition-colors text-center mb-1">
-                      {community.name}
-                    </h3>
-                    <p className="text-xs text-gray-400 truncate max-w-[180px] text-center">
-                      {community.description || "No description"}
-                    </p>
-                  </Link>
-                ))
-              )}
-              
+                  ))
+                : communities?.slice(0, 10).map((community) => (
+                    <Link
+                      key={community.id}
+                      to={`/community/${community.id}`}
+                      className="bg-gray-800/50 hover:bg-gray-800/80 rounded-lg p-4 flex flex-col items-center transition-all duration-300 border border-transparent hover:border-purple-500/30 group"
+                    >
+                      <div className="w-14 h-14 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-full flex items-center justify-center mb-3 group-hover:from-purple-500/50 group-hover:to-pink-500/50 transition-all duration-300">
+                        <span className="text-xl font-bold text-white">
+                          {community.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <h3 className="font-medium text-white group-hover:text-purple-400 transition-colors text-center mb-1">
+                        {community.name}
+                      </h3>
+                      <p className="text-xs text-gray-400 truncate max-w-[180px] text-center">
+                        {community.description || "No description"}
+                      </p>
+                    </Link>
+                  ))}
+
               {/* Create Community Button */}
               <Link
                 to="/community/create"
@@ -350,11 +358,13 @@ export const Home = () => {
                     />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-purple-400">Create Community</span>
+                <span className="text-sm font-medium text-purple-400">
+                  Create Community
+                </span>
               </Link>
             </div>
           </motion.div>
-          
+
           {/* Join Vistagram Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -416,21 +426,26 @@ const fetchPostsByCommunity = async (communityId: number): Promise<Post[]> => {
 };
 
 // Custom PostList component for HomePage with compact post items in a grid
-const HomepagePostList = ({ selectedCommunity }: { selectedCommunity: number | null }) => {
+const HomepagePostList = ({
+  selectedCommunity,
+}: {
+  selectedCommunity: number | null;
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(6); // Show 6 posts per page (3 rows of 2)
-  
+
   // Reset page when community filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCommunity]);
-  
-
 
   // Fetch posts based on selected community
   const { data, isLoading, error } = useQuery({
     queryKey: ["home-posts", selectedCommunity],
-    queryFn: () => selectedCommunity ? fetchPostsByCommunity(selectedCommunity) : fetchPosts(),
+    queryFn: () =>
+      selectedCommunity
+        ? fetchPostsByCommunity(selectedCommunity)
+        : fetchPosts(),
   });
 
   // Get current posts for pagination

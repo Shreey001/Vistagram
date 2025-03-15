@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 interface Props {
   postId: number;
+  redditStyle?: boolean;
 }
 
 interface NewComment {
@@ -55,7 +56,7 @@ const fetchComments = async (postId: number): Promise<Comment[]> => {
   return data as Comment[];
 };
 
-export const CommentSection = ({ postId }: Props) => {
+export const CommentSection = ({ postId, redditStyle = false }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [newCommentText, setNewCommentText] = useState("");
@@ -149,6 +150,30 @@ export const CommentSection = ({ postId }: Props) => {
       .substring(0, 2);
   };
 
+  // Generate a random color for Reddit-style avatars
+  const getRandomColor = (seed: string) => {
+    const colors = [
+      "bg-red-500",
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-yellow-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-teal-500",
+      "bg-orange-500",
+      "bg-cyan-500",
+    ];
+
+    // Use the seed to deterministically select a color
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-[200px] flex items-center justify-center">
@@ -225,9 +250,19 @@ export const CommentSection = ({ postId }: Props) => {
               <div className="flex gap-3">
                 {/* User avatar */}
                 <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-medium">
-                    {getInitials(user?.user_metadata?.user_name)}
-                  </div>
+                  {redditStyle ? (
+                    <div
+                      className={`w-10 h-10 rounded-full ${getRandomColor(
+                        user?.user_metadata?.user_name || "anonymous"
+                      )} flex items-center justify-center text-white font-medium`}
+                    >
+                      {getInitials(user?.user_metadata?.user_name)}
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-medium">
+                      {getInitials(user?.user_metadata?.user_name)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Input area */}
@@ -376,7 +411,11 @@ export const CommentSection = ({ postId }: Props) => {
                 transition={{ delay: index * 0.05 }}
                 className="border-t border-purple-500/10 pt-4 first:border-t-0 first:pt-0"
               >
-                <CommentItem comment={comment} postId={postId} />
+                <CommentItem
+                  comment={comment}
+                  postId={postId}
+                  redditStyle={redditStyle}
+                />
               </motion.div>
             ))}
           </AnimatePresence>

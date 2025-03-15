@@ -9,6 +9,7 @@ interface Props {
   comment: Comment & { children?: Comment[] };
   postId: number;
   parentAuthor?: string;
+  redditStyle?: boolean;
 }
 
 const createReply = async (
@@ -57,7 +58,12 @@ const formatRelativeTime = (date: string) => {
   return "Just now";
 };
 
-export const CommentItem = ({ comment, postId, parentAuthor }: Props) => {
+export const CommentItem = ({
+  comment,
+  postId,
+  parentAuthor,
+  redditStyle = false,
+}: Props) => {
   const [showReply, setShowReply] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>("");
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
@@ -106,25 +112,31 @@ export const CommentItem = ({ comment, postId, parentAuthor }: Props) => {
       .substring(0, 2);
   };
 
-  // Get random color based on name (for consistent avatar colors)
-  const getAvatarColor = (name: string) => {
+  // Generate a random color for Reddit-style avatars
+  const getRandomColor = (seed: string) => {
     const colors = [
-      "from-purple-500 to-pink-500",
-      "from-blue-500 to-indigo-500",
-      "from-green-500 to-teal-500",
-      "from-yellow-500 to-orange-500",
-      "from-red-500 to-pink-500",
-      "from-indigo-500 to-purple-500",
+      "bg-red-500",
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-yellow-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-teal-500",
+      "bg-orange-500",
+      "bg-cyan-500",
     ];
 
-    // Use the sum of character codes to determine the color
-    const sum = name
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[sum % colors.length];
+    // Use the seed to deterministically select a color
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    return colors[Math.abs(hash) % colors.length];
   };
 
-  const avatarColor = getAvatarColor(comment.author);
+  const avatarColor = getRandomColor(comment.author);
   const isRootComment = !comment.parent_comment_id;
 
   return (
@@ -142,13 +154,21 @@ export const CommentItem = ({ comment, postId, parentAuthor }: Props) => {
         <div className="flex items-start gap-3">
           {/* Avatar */}
           <div className="flex-shrink-0">
-            <div
-              className={`rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-medium overflow-hidden ${
-                isRootComment ? "w-10 h-10 text-sm" : "w-8 h-8 text-xs"
-              }`}
-            >
-              {getInitials(comment.author)}
-            </div>
+            {redditStyle ? (
+              <div
+                className={`w-8 h-8 rounded-full ${getRandomColor(
+                  comment.author
+                )} flex items-center justify-center text-white font-medium text-sm`}
+              >
+                {getInitials(comment.author)}
+              </div>
+            ) : (
+              <div
+                className={`w-8 h-8 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-medium text-sm`}
+              >
+                {getInitials(comment.author)}
+              </div>
+            )}
           </div>
 
           {/* Comment content */}
@@ -369,22 +389,22 @@ export const CommentItem = ({ comment, postId, parentAuthor }: Props) => {
         {/* Nested replies */}
         <AnimatePresence>
           {!isCollapsed && comment.children && comment.children.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mt-3 space-y-3"
+            <div
+              className={`mt-4 pl-4 md:pl-8 border-l-2 ${
+                isCollapsed ? "hidden" : "block"
+              } border-gray-800`}
             >
-              {comment.children.map((reply) => (
-                <CommentItem
-                  key={reply.id}
-                  comment={reply}
-                  postId={postId}
-                  parentAuthor={comment.author}
-                />
+              {comment.children.map((childComment) => (
+                <div key={childComment.id} className="mb-4 last:mb-0">
+                  <CommentItem
+                    comment={childComment}
+                    postId={postId}
+                    parentAuthor={comment.author}
+                    redditStyle={redditStyle}
+                  />
+                </div>
               ))}
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </div>
