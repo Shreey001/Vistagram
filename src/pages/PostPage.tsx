@@ -228,6 +228,11 @@ export const PostPage = () => {
         >
           {/* Post Content */}
           <div className="p-6 md:p-10">
+            {/* Votes Section */}
+            <div className="mb-6">
+              <LikeButton postId={postId} />
+            </div>
+
             <div className="prose prose-lg prose-invert prose-headings:text-pink-400 prose-a:text-purple-400 prose-strong:text-white prose-ul:text-gray-300 prose-ol:text-gray-300 max-w-none">
               {/* Check if content contains HTML tags */}
               {post.content.includes("<") && post.content.includes(">") ? (

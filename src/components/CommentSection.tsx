@@ -35,14 +35,28 @@ const createComment = async (
     throw new Error("User ID or author is required");
   }
 
-  const { error } = await supabase.from("comments").insert({
+  console.log("Creating comment with data:", {
     content: newComment.content,
     parent_comment_id: newComment.parent_comment_id || null,
     post_id: postId,
     user_id: userId,
     author: author,
   });
-  if (error) throw new Error(error.message);
+
+  const { data, error } = await supabase.from("comments").insert({
+    content: newComment.content,
+    parent_comment_id: newComment.parent_comment_id || null,
+    post_id: postId,
+    user_id: userId,
+    author: author,
+  });
+
+  if (error) {
+    console.error("Error creating comment:", error);
+    throw new Error(`Failed to create comment: ${error.message}`);
+  }
+
+  return data;
 };
 
 const fetchComments = async (postId: number): Promise<Comment[]> => {
@@ -81,16 +95,28 @@ export const CommentSection = ({ postId, redditStyle = false }: Props) => {
     }
   }, [comments]);
 
-  const { mutate, isPending, isError } = useMutation({
-    mutationFn: (newComment: NewComment) =>
-      createComment(
-        newComment,
-        postId,
-        user?.id,
-        user?.user_metadata?.user_name
-      ),
+  const {
+    mutate,
+    isPending,
+    isError,
+    error: mutationError,
+  } = useMutation({
+    mutationFn: (newComment: NewComment) => {
+      // Ensure we have a valid author name
+      const authorName =
+        user?.user_metadata?.user_name ||
+        user?.email?.split("@")[0] ||
+        "Anonymous User";
+
+      console.log("Using author name:", authorName);
+
+      return createComment(newComment, postId, user?.id, authorName);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+    },
+    onError: (error) => {
+      console.error("Mutation error:", error);
     },
   });
 
@@ -354,7 +380,9 @@ export const CommentSection = ({ postId, redditStyle = false }: Props) => {
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute bottom-full left-0 right-0 mb-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm"
                 >
-                  Failed to post comment. Please try again.
+                  {mutationError instanceof Error
+                    ? mutationError.message
+                    : "Failed to post comment. Please try again."}
                 </motion.div>
               )}
             </AnimatePresence>

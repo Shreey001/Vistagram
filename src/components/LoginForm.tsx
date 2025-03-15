@@ -7,20 +7,30 @@ type FormMode = "login" | "signup" | "reset";
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [formMode, setFormMode] = useState<FormMode>("login");
-  const { signIn, signUp, resetPassword, signInWithGithub, authError, isLoading } = useAuth();
+  const {
+    signIn,
+    signUp,
+    resetPassword,
+    signInWithGithub,
+    authError,
+    isLoading,
+  } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formMode === "login") {
       await signIn(email, password);
     } else if (formMode === "signup") {
-      await signUp(email, password);
+      await signUp(email, password, username);
     } else if (formMode === "reset") {
       await resetPassword(email);
       // Show success message after reset email is sent
-      alert("If your email exists in our system, you will receive a password reset link.");
+      alert(
+        "If your email exists in our system, you will receive a password reset link."
+      );
       setFormMode("login");
     }
   };
@@ -44,9 +54,14 @@ export const LoginForm = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="text-sm font-medium text-gray-300 mb-1 flex items-center justify-between">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-300 mb-1 flex items-center justify-between"
+              >
                 <span>Email Address</span>
-                {email && <span className="text-xs text-purple-400">Required</span>}
+                {email && (
+                  <span className="text-xs text-purple-400">Required</span>
+                )}
               </label>
               <div className="relative">
                 <input
@@ -59,18 +74,75 @@ export const LoginForm = () => {
                   placeholder="Enter your email"
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <svg
+                    className="h-5 w-5 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
                 </div>
               </div>
             </div>
 
+            {formMode === "signup" && (
+              <div>
+                <label
+                  htmlFor="username"
+                  className="text-sm font-medium text-gray-300 mb-1 flex items-center justify-between"
+                >
+                  <span>Username</span>
+                  {username && (
+                    <span className="text-xs text-purple-400">Required</span>
+                  )}
+                </label>
+                <div className="relative">
+                  <input
+                    id="username"
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800/50 border border-purple-500/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
+                    placeholder="Choose a username"
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                      className="h-5 w-5 text-gray-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {formMode !== "reset" && (
               <div>
-                <label htmlFor="password" className="text-sm font-medium text-gray-300 mb-1 flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-300 mb-1 flex items-center justify-between"
+                >
                   <span>Password</span>
-                  {password && <span className="text-xs text-purple-400">{formMode === "signup" ? "Min 6 characters" : "Required"}</span>}
+                  {password && (
+                    <span className="text-xs text-purple-400">
+                      {formMode === "signup" ? "Min 6 characters" : "Required"}
+                    </span>
+                  )}
                 </label>
                 <div className="relative">
                   <input
@@ -80,12 +152,26 @@ export const LoginForm = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800/50 border border-purple-500/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
-                    placeholder={formMode === "signup" ? "Create a password" : "Enter your password"}
+                    placeholder={
+                      formMode === "signup"
+                        ? "Create a password"
+                        : "Enter your password"
+                    }
                     minLength={6}
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    <svg
+                      className="h-5 w-5 text-gray-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -101,10 +187,22 @@ export const LoginForm = () => {
                   className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center"
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
-                    <p className="text-red-400 text-sm font-medium">{authError}</p>
+                    <p className="text-red-400 text-sm font-medium">
+                      {authError}
+                    </p>
                   </div>
                 </motion.div>
               )}
@@ -151,14 +249,16 @@ export const LoginForm = () => {
                 </>
               )}
             </motion.button>
-            
+
             {(formMode === "login" || formMode === "signup") && (
               <div className="mt-4">
                 <div className="relative flex items-center justify-center">
                   <div className="border-t border-gray-700 w-full"></div>
-                  <div className="text-xs text-gray-500 bg-gray-900/50 px-2 absolute">OR</div>
+                  <div className="text-xs text-gray-500 bg-gray-900/50 px-2 absolute">
+                    OR
+                  </div>
                 </div>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -167,10 +267,16 @@ export const LoginForm = () => {
                   disabled={isLoading}
                   className="w-full mt-4 px-6 py-3 rounded-lg font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 transition-all flex items-center justify-center gap-2"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                   </svg>
-                  {formMode === "login" ? "Sign in with GitHub" : "Sign up with GitHub"}
+                  {formMode === "login"
+                    ? "Sign in with GitHub"
+                    : "Sign up with GitHub"}
                 </motion.button>
               </div>
             )}

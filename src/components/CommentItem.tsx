@@ -23,14 +23,28 @@ const createReply = async (
     throw new Error("User ID or author is required to reply");
   }
 
-  const { error } = await supabase.from("comments").insert({
+  console.log("Creating reply with data:", {
     content: replyContent,
     parent_comment_id: parentCommentId,
     post_id: postId,
     user_id: userId,
     author: author,
   });
-  if (error) throw new Error(error.message);
+
+  const { data, error } = await supabase.from("comments").insert({
+    content: replyContent,
+    parent_comment_id: parentCommentId,
+    post_id: postId,
+    user_id: userId,
+    author: author,
+  });
+
+  if (error) {
+    console.error("Error creating reply:", error);
+    throw new Error(`Failed to create reply: ${error.message}`);
+  }
+
+  return data;
 };
 
 const formatRelativeTime = (date: string) => {
@@ -80,17 +94,37 @@ export const CommentItem = ({
     }
   }, [replyText]);
 
-  const { mutate, isPending, isError } = useMutation({
-    mutationFn: (replyContent: string) =>
-      createReply(
+  const {
+    mutate,
+    isPending,
+    isError,
+    error: mutationError,
+  } = useMutation({
+    mutationFn: (replyContent: string) => {
+      // Ensure we have a valid author name
+      const authorName =
+        user?.user_metadata?.user_name ||
+        user?.email?.split("@")[0] ||
+        "Anonymous User";
+
+      console.log("Using author name for reply:", authorName);
+
+      return createReply(
         replyContent,
         postId,
         comment.id,
         user?.id,
-        user?.user_metadata?.user_name
-      ),
+        authorName
+      );
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      setReplyText("");
+      setShowReply(false);
+      setIsComposing(false);
+    },
+    onError: (error) => {
+      console.error("Reply mutation error:", error);
     },
   });
 
@@ -98,9 +132,6 @@ export const CommentItem = ({
     e.preventDefault();
     if (!replyText.trim() || isPending) return;
     mutate(replyText);
-    setReplyText("");
-    setShowReply(false);
-    setIsComposing(false);
   };
 
   const getInitials = (name: string) => {
@@ -378,7 +409,9 @@ export const CommentItem = ({
                     exit={{ opacity: 0, y: -10 }}
                     className="mt-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm"
                   >
-                    Failed to post reply. Please try again.
+                    {mutationError instanceof Error
+                      ? mutationError.message
+                      : "Failed to post reply. Please try again."}
                   </motion.div>
                 )}
               </AnimatePresence>

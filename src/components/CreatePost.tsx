@@ -21,15 +21,39 @@ interface PostInput {
   avatar_url?: string;
   community_id?: number | null;
   image_url?: string;
+  author?: string;
+  user_name?: string;
+  user_id?: string;
 }
 
 // Create a post with an image URL - this avoids storage issues
 const createPost = async (post: PostInput) => {
   try {
+    // Create a safe post object by removing potentially problematic fields
+    // if they're causing database schema issues
+    const safePost = { ...post };
+
     // Insert the post with the provided image URL
-    const { data, error } = await supabase.from("posts").insert(post);
+    const { data, error } = await supabase.from("posts").insert(safePost);
 
     if (error) {
+      // If there's an error about the author column, try again without it
+      if (error.message.includes("author")) {
+        console.warn("Author column not found, trying without author field");
+        const { author, ...postWithoutAuthor } = safePost;
+        const retryResult = await supabase
+          .from("posts")
+          .insert(postWithoutAuthor);
+
+        if (retryResult.error) {
+          throw new Error(
+            `Failed to create post: ${retryResult.error.message}`
+          );
+        }
+
+        return retryResult.data;
+      }
+
       throw new Error(`Failed to create post: ${error.message}`);
     }
 
@@ -317,18 +341,39 @@ export const CreatePost = () => {
         throw new Error("Please select an image");
       }
 
+      if (!user?.id) {
+        throw new Error("You must be logged in to create a post");
+      }
+
+      // Get the user name from metadata or email
+      const userName =
+        user?.user_metadata?.user_name ||
+        user?.email?.split("@")[0] ||
+        "Anonymous User";
+
       // Use the actual uploaded image from previewUrl
       const post: PostInput = {
         title,
         content,
         community_id: communityId,
         image_url: previewUrl, // Use the actual uploaded image
+        // Always provide an avatar_url, even for email users
+        avatar_url:
+          user?.user_metadata?.avatar_url ||
+          `https://ui-avatars.com/api/?name=${
+            user?.user_metadata?.user_name || user?.email?.split("@")[0]
+          }&background=random`,
+        author: userName,
+        user_name: userName,
+        user_id: user.id, // Add the user_id field
       };
 
-      if (user?.user_metadata?.avatar_url) {
-        post.avatar_url = user.user_metadata.avatar_url;
-      }
-
+      console.log(
+        "Creating post with author:",
+        userName,
+        "and user_id:",
+        user.id
+      );
       return createPost(post);
     },
     onSuccess: () => {
@@ -497,40 +542,40 @@ export const CreatePost = () => {
                   >
                     Post Title
                   </label>
-                  <input
+        <input
                     id="title"
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
                     required
                     placeholder="Enter an eye-catching title"
                     className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-purple-500/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
-                  />
-                </div>
+        />
+      </div>
 
-                <div>
-                  <label
-                    htmlFor="content"
+      <div>
+        <label
+          htmlFor="content"
                     className="block text-sm font-medium text-gray-300 mb-2"
-                  >
+        >
                     Post Content
-                  </label>
+        </label>
                   <div className="rounded-lg overflow-hidden border border-purple-500/30 bg-gray-800/50 text-white focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-transparent transition-all">
                     <MenuBar editor={editor} />
                     <EditorContent
                       editor={editor}
                       className="px-4 py-3 min-h-[150px] prose prose-invert prose-sm max-w-none focus:outline-none"
-                    />
-                  </div>
-                </div>
+        />
+      </div>
+      </div>
 
-                <div>
-                  <label
-                    htmlFor="image"
+      <div>
+        <label
+          htmlFor="image"
                     className="block text-sm font-medium text-gray-300 mb-2"
-                  >
+        >
                     Post Image
-                  </label>
+        </label>
                   <div className="relative">
                     {previewUrl ? (
                       <div className="relative mb-3 overflow-hidden rounded-lg aspect-video">
@@ -587,13 +632,13 @@ export const CreatePost = () => {
                             PNG, JPG, or GIF (Max 5MB)
                           </p>
                         </div>
-                        <input
+          <input
                           id="image"
-                          type="file"
-                          accept="image/*"
+            type="file"
+            accept="image/*"
                           onChange={handleFileChange}
                           className="hidden"
-                          required
+            required
                         />
                       </label>
                     )}
@@ -680,14 +725,14 @@ export const CreatePost = () => {
                     {previewUrl && (
                       <img
                         src={previewUrl}
-                        alt="Preview"
+                  alt="Preview"
                         className="w-full h-48 object-cover"
-                      />
+                />
                     )}
                   </div>
                   <h4 className="text-xl font-bold text-white mb-2">{title}</h4>
                   <p className="text-gray-300 text-sm">{content}</p>
-                </div>
+              </div>
 
                 <div className="flex justify-between pt-4">
                   <motion.button
@@ -767,7 +812,7 @@ export const CreatePost = () => {
                       </>
                     )}
                   </motion.button>
-                </div>
+            </div>
               </motion.div>
             </form>
           )}

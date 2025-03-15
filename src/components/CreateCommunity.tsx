@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../supabase-client";
+import { useAuth } from "../context/AuthContext";
 
 interface CommunityInput {
   name: string;
@@ -21,9 +22,19 @@ export const CreateCommunity = () => {
   const [formStep, setFormStep] = useState<number>(1);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { mutate, isPending, isError, error } = useMutation({
-    mutationFn: createCommunity,
+    mutationFn: () => {
+      if (!user) {
+        throw new Error("You must be logged in to create a community");
+      }
+
+      return createCommunity({
+        name,
+        description,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["communities"] });
       setFormStep(2);
@@ -36,7 +47,7 @@ export const CreateCommunity = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate({ name, description });
+    mutate();
   };
 
   return (

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Post } from "./PostList";
 import { motion } from "framer-motion";
+import { LikeButton } from "./LikeButton";
 
 interface Props {
   post: Post;
@@ -39,7 +40,9 @@ const PostItem = ({ post, compact = false }: Props) => {
           {/* Floating badge for community if available */}
           {post.communities && (
             <div className="absolute top-2 right-2 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-full shadow-lg">
-              {post.communities.name}
+              {Array.isArray(post.communities)
+                ? post.communities[0]?.name
+                : post.communities.name}
             </div>
           )}
         </div>
@@ -93,20 +96,7 @@ const PostItem = ({ post, compact = false }: Props) => {
                 whileHover={{ scale: 1.05 }}
                 className="flex items-center gap-1 sm:gap-1.5 bg-pink-500/10 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
               >
-                <svg
-                  className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-medium text-pink-400 text-xs">
-                  {post.like_count || 0}
-                </span>
+                <LikeButton postId={post.id} minimal={true} />
               </motion.div>
 
               <motion.div
@@ -160,7 +150,9 @@ const CompactPostItem = ({ post }: { post: Post }) => {
           {/* Community badge */}
           {post.communities && (
             <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-purple-500/80 backdrop-blur-sm text-white text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow-md">
-              {post.communities.name}
+              {Array.isArray(post.communities)
+                ? post.communities[0]?.name
+                : post.communities.name}
             </div>
           )}
 
@@ -170,8 +162,8 @@ const CompactPostItem = ({ post }: { post: Post }) => {
           {/* Title overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
             <h2 className="text-sm sm:text-base font-bold text-white line-clamp-2">
-              {post.title}
-            </h2>
+                {post.title}
+              </h2>
           </div>
         </div>
 
@@ -202,20 +194,7 @@ const CompactPostItem = ({ post }: { post: Post }) => {
           {/* Engagement metrics */}
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-1 sm:gap-1.5">
-              <svg
-                className="w-3 h-3 sm:w-4 sm:h-4 text-pink-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="text-pink-400 text-xs sm:text-sm">
-                {post.like_count || 0}
-              </span>
+              <LikeButton postId={post.id} minimal={true} />
             </div>
             <div className="flex items-center gap-1 sm:gap-1.5">
               <svg
@@ -267,8 +246,29 @@ const CommunityPostItem = ({ post }: { post: Post }) => {
         </div>
 
         <div className="p-2 sm:p-3">
-          {/* Date only */}
-          <div className="flex justify-end">
+          {/* Engagement metrics and date */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <LikeButton postId={post.id} minimal={true} />
+              </div>
+              <div className="flex items-center gap-1">
+                <svg
+                  className="w-3 h-3 text-purple-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-purple-400 text-xs">
+                  {post.comment_count || 0}
+                </span>
+              </div>
+            </div>
             <span className="text-xs text-gray-400">
               {new Date(post.created_at).toLocaleDateString("en-US", {
                 month: "short",

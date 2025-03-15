@@ -7,7 +7,7 @@ import { supabase } from "../supabase-client";
 interface AuthContextType {
   user: User | null;
   signInWithGithub: () => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, username?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Handle email sign up
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, username?: string) => {
     setIsLoading(true);
     setAuthError(null);
     const { error } = await supabase.auth.signUp({
@@ -69,6 +69,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       password,
       options: {
         emailRedirectTo: window.location.origin,
+        data: {
+          user_name: username || email.split("@")[0],
+        },
       },
     });
 
