@@ -31,44 +31,63 @@ const fetchUserPosts = async (userId: string): Promise<Post[]> => {
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
-    // If there's an error with user_id or no posts found, try with user_name as fallback
-    if (userIdError || !userIdData || userIdData.length === 0) {
-      console.log("No posts found with user_id, trying with user_name");
+    // If we found posts with user_id, process them
+    if (!userIdError && userIdData && userIdData.length > 0) {
+      console.log(`Found ${userIdData.length} posts for user ID: ${userId}`);
 
-      // Get the user details to find the user_name
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("user_name")
-        .eq("id", userId)
-        .single();
+      // For each post, fetch its community if it has one
+      const postsWithCommunities = await Promise.all(
+        userIdData.map(async (post) => {
+          if (post.community_id) {
+            const { data: communityData, error: communityError } =
+              await supabase
+                .from("communities")
+                .select("id, name")
+                .eq("id", post.community_id)
+                .single();
 
-      // If we can't get user data, try with auth user info
-      if (userError) {
-        console.log("Error fetching user data, using auth user info");
-        const { data: authUser } = await supabase.auth.getUser(userId);
-        const userName =
-          authUser?.user?.user_metadata?.user_name ||
-          authUser?.user?.email?.split("@")[0] ||
-          "Anonymous User";
+            if (!communityError && communityData) {
+              return {
+                ...post,
+                communities: communityData,
+              };
+            }
+          }
+          return post;
+        })
+      );
 
-        // Try to get posts by user_name
-        const { data, error } = await supabase
-          .from("posts")
-          .select("*")
-          .eq("user_name", userName)
-          .order("created_at", { ascending: false });
+      return postsWithCommunities;
+    }
 
-        if (error) {
-          console.error("Error fetching posts by user_name:", error);
-          return [];
-        }
+    // If no posts found with user_id, try to get the user's name
+    console.log("No posts found with user_id, trying with user_name");
 
-        // If there are no posts, return an empty array
-        if (!data || data.length === 0) {
-          console.log("No posts found for user:", userName);
-          return [];
-        }
+    // Skip the users table query if it's likely to fail (table might not exist yet)
+    // Go directly to using session data
+    console.log("Trying to get user info from session data");
 
+    // Get the current session
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+
+    if (!sessionError && sessionData?.session?.user) {
+      const authUser = sessionData.session.user;
+      const userName =
+        authUser?.user_metadata?.user_name ||
+        authUser?.email?.split("@")[0] ||
+        "Anonymous User";
+
+      console.log(`Using user_name from session: ${userName}`);
+
+      // Try to get posts by user_name
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("user_name", userName)
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
         console.log(`Found ${data.length} posts for user: ${userName}`);
 
         // For each post, fetch its community if it has one
@@ -95,79 +114,10 @@ const fetchUserPosts = async (userId: string): Promise<Post[]> => {
 
         return postsWithCommunities;
       }
-
-      const userName = userData?.user_name || "Anonymous User";
-
-      // Try to get posts by user_name
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("user_name", userName)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching posts by user_name:", error);
-        return [];
-      }
-
-      // If there are no posts, return an empty array
-      if (!data || data.length === 0) {
-        console.log("No posts found for user:", userName);
-        return [];
-      }
-
-      console.log(`Found ${data.length} posts for user: ${userName}`);
-
-      // For each post, fetch its community if it has one
-      const postsWithCommunities = await Promise.all(
-        data.map(async (post) => {
-          if (post.community_id) {
-            const { data: communityData, error: communityError } =
-              await supabase
-                .from("communities")
-                .select("id, name")
-                .eq("id", post.community_id)
-                .single();
-
-            if (!communityError && communityData) {
-              return {
-                ...post,
-                communities: communityData,
-              };
-            }
-          }
-          return post;
-        })
-      );
-
-      return postsWithCommunities;
     }
 
-    // If we found posts with user_id, process them
-    console.log(`Found ${userIdData.length} posts for user ID: ${userId}`);
-
-    // For each post, fetch its community if it has one
-    const postsWithCommunities = await Promise.all(
-      userIdData.map(async (post) => {
-        if (post.community_id) {
-          const { data: communityData, error: communityError } = await supabase
-            .from("communities")
-            .select("id, name")
-            .eq("id", post.community_id)
-            .single();
-
-          if (!communityError && communityData) {
-            return {
-              ...post,
-              communities: communityData,
-            };
-          }
-        }
-        return post;
-      })
-    );
-
-    return postsWithCommunities;
+    console.log("No posts found for user");
+    return [];
   } catch (error) {
     console.error("Error fetching user posts:", error);
     return [];
@@ -188,45 +138,31 @@ const fetchUserComments = async (userId: string): Promise<Comment[]> => {
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
-    // If there's an error with user_id or no comments found, try with author as fallback
-    if (userIdError || !userIdData || userIdData.length === 0) {
-      console.log("No comments found with user_id, trying with author");
+    // If we found comments with user_id, return them
+    if (!userIdError && userIdData && userIdData.length > 0) {
+      console.log(`Found ${userIdData.length} comments for user ID: ${userId}`);
+      return userIdData;
+    }
 
-      // Get the user details to find the user_name
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("user_name")
-        .eq("id", userId)
-        .single();
+    // If no comments found with user_id, try to get the user's name
+    console.log("No comments found with user_id, trying with author");
 
-      // If we can't get user data, try with auth user info
-      if (userError) {
-        console.log("Error fetching user data, using auth user info");
-        const { data: authUser } = await supabase.auth.getUser(userId);
-        const userName =
-          authUser?.user?.user_metadata?.user_name ||
-          authUser?.user?.email?.split("@")[0] ||
-          "Anonymous User";
+    // Skip the users table query if it's likely to fail (table might not exist yet)
+    // Go directly to using session data
+    console.log("Trying to get user info from session data");
 
-        // Try to get comments by author
-        const { data, error } = await supabase
-          .from("comments")
-          .select("*, posts(id, title, image_url)")
-          .eq("author", userName)
-          .order("created_at", { ascending: false });
+    // Get the current session
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
 
-        if (error) {
-          console.error("Error fetching comments by author:", error);
-          return [];
-        }
+    if (!sessionError && sessionData?.session?.user) {
+      const authUser = sessionData.session.user;
+      const userName =
+        authUser?.user_metadata?.user_name ||
+        authUser?.email?.split("@")[0] ||
+        "Anonymous User";
 
-        console.log(
-          `Found ${data?.length || 0} comments for user: ${userName}`
-        );
-        return data || [];
-      }
-
-      const userName = userData?.user_name || "Anonymous User";
+      console.log(`Using user_name from session: ${userName}`);
 
       // Try to get comments by author
       const { data, error } = await supabase
@@ -235,18 +171,14 @@ const fetchUserComments = async (userId: string): Promise<Comment[]> => {
         .eq("author", userName)
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching comments by author:", error);
-        return [];
+      if (!error && data && data.length > 0) {
+        console.log(`Found ${data.length} comments for user: ${userName}`);
+        return data;
       }
-
-      console.log(`Found ${data?.length || 0} comments for user: ${userName}`);
-      return data || [];
     }
 
-    // If we found comments with user_id, return them
-    console.log(`Found ${userIdData.length} comments for user ID: ${userId}`);
-    return userIdData;
+    console.log("No comments found for user");
+    return [];
   } catch (error) {
     console.error("Error fetching user comments:", error);
     return [];

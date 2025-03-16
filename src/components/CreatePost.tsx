@@ -29,6 +29,8 @@ interface PostInput {
 // Create a post with an image URL - this avoids storage issues
 const createPost = async (post: PostInput) => {
   try {
+    console.log("Creating post with data:", post);
+
     // Create a safe post object by removing potentially problematic fields
     // if they're causing database schema issues
     const safePost = { ...post };
@@ -37,6 +39,8 @@ const createPost = async (post: PostInput) => {
     const { data, error } = await supabase.from("posts").insert(safePost);
 
     if (error) {
+      console.error("Error creating post:", error);
+
       // If there's an error about the author column, try again without it
       if (error.message.includes("author")) {
         console.warn("Author column not found, trying without author field");
@@ -44,6 +48,68 @@ const createPost = async (post: PostInput) => {
         const retryResult = await supabase
           .from("posts")
           .insert(postWithoutAuthor);
+
+        if (retryResult.error) {
+          // If there's still an error, try with minimal fields
+          if (
+            retryResult.error.message.includes("user_name") ||
+            retryResult.error.message.includes("user_id")
+          ) {
+            console.warn(
+              "user_name or user_id column issue, trying with minimal fields"
+            );
+            const minimalPost = {
+              title: post.title,
+              content: post.content,
+              image_url: post.image_url,
+              community_id: post.community_id,
+            };
+
+            const lastRetry = await supabase.from("posts").insert(minimalPost);
+
+            if (lastRetry.error) {
+              throw new Error(
+                `Failed to create post: ${lastRetry.error.message}`
+              );
+            }
+
+            return lastRetry.data;
+          }
+
+          throw new Error(
+            `Failed to create post: ${retryResult.error.message}`
+          );
+        }
+
+        return retryResult.data;
+      }
+
+      // If there's an error about the user_name column, try again without it
+      if (error.message.includes("user_name")) {
+        console.warn(
+          "user_name column not found, trying without user_name field"
+        );
+        const { user_name, ...postWithoutUserName } = safePost;
+        const retryResult = await supabase
+          .from("posts")
+          .insert(postWithoutUserName);
+
+        if (retryResult.error) {
+          throw new Error(
+            `Failed to create post: ${retryResult.error.message}`
+          );
+        }
+
+        return retryResult.data;
+      }
+
+      // If there's an error about the user_id column, try again without it
+      if (error.message.includes("user_id")) {
+        console.warn("user_id column not found, trying without user_id field");
+        const { user_id, ...postWithoutUserId } = safePost;
+        const retryResult = await supabase
+          .from("posts")
+          .insert(postWithoutUserId);
 
         if (retryResult.error) {
           throw new Error(
@@ -59,6 +125,7 @@ const createPost = async (post: PostInput) => {
 
     return data;
   } catch (err) {
+    console.error("Error in createPost:", err);
     throw err;
   }
 };
@@ -542,40 +609,40 @@ export const CreatePost = () => {
                   >
                     Post Title
                   </label>
-        <input
+                  <input
                     id="title"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     required
                     placeholder="Enter an eye-catching title"
                     className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-purple-500/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
-        />
-      </div>
+                  />
+                </div>
 
-      <div>
-        <label
-          htmlFor="content"
+                <div>
+                  <label
+                    htmlFor="content"
                     className="block text-sm font-medium text-gray-300 mb-2"
-        >
+                  >
                     Post Content
-        </label>
+                  </label>
                   <div className="rounded-lg overflow-hidden border border-purple-500/30 bg-gray-800/50 text-white focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-transparent transition-all">
                     <MenuBar editor={editor} />
                     <EditorContent
                       editor={editor}
                       className="px-4 py-3 min-h-[150px] prose prose-invert prose-sm max-w-none focus:outline-none"
-        />
-      </div>
-      </div>
+                    />
+                  </div>
+                </div>
 
-      <div>
-        <label
-          htmlFor="image"
+                <div>
+                  <label
+                    htmlFor="image"
                     className="block text-sm font-medium text-gray-300 mb-2"
-        >
+                  >
                     Post Image
-        </label>
+                  </label>
                   <div className="relative">
                     {previewUrl ? (
                       <div className="relative mb-3 overflow-hidden rounded-lg aspect-video">
@@ -632,13 +699,13 @@ export const CreatePost = () => {
                             PNG, JPG, or GIF (Max 5MB)
                           </p>
                         </div>
-          <input
+                        <input
                           id="image"
-            type="file"
-            accept="image/*"
+                          type="file"
+                          accept="image/*"
                           onChange={handleFileChange}
                           className="hidden"
-            required
+                          required
                         />
                       </label>
                     )}
@@ -725,14 +792,14 @@ export const CreatePost = () => {
                     {previewUrl && (
                       <img
                         src={previewUrl}
-                  alt="Preview"
+                        alt="Preview"
                         className="w-full h-48 object-cover"
-                />
+                      />
                     )}
                   </div>
                   <h4 className="text-xl font-bold text-white mb-2">{title}</h4>
                   <p className="text-gray-300 text-sm">{content}</p>
-              </div>
+                </div>
 
                 <div className="flex justify-between pt-4">
                   <motion.button
@@ -812,7 +879,7 @@ export const CreatePost = () => {
                       </>
                     )}
                   </motion.button>
-            </div>
+                </div>
               </motion.div>
             </form>
           )}

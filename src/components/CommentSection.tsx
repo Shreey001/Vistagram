@@ -43,20 +43,65 @@ const createComment = async (
     author: author,
   });
 
-  const { data, error } = await supabase.from("comments").insert({
-    content: newComment.content,
-    parent_comment_id: newComment.parent_comment_id || null,
-    post_id: postId,
-    user_id: userId,
-    author: author,
-  });
+  try {
+    // Create the comment with both user_id and author fields
+    const { data, error } = await supabase.from("comments").insert({
+      content: newComment.content,
+      parent_comment_id: newComment.parent_comment_id || null,
+      post_id: postId,
+      user_id: userId,
+      author: author,
+    });
 
-  if (error) {
-    console.error("Error creating comment:", error);
-    throw new Error(`Failed to create comment: ${error.message}`);
+    if (error) {
+      console.error("Error creating comment:", error);
+
+      // If there's an error with the user_id field, try without it
+      if (error.message.includes("user_id") && author) {
+        console.log("Retrying without user_id field");
+        const { data: retryData, error: retryError } = await supabase
+          .from("comments")
+          .insert({
+            content: newComment.content,
+            parent_comment_id: newComment.parent_comment_id || null,
+            post_id: postId,
+            author: author,
+          });
+
+        if (retryError) {
+          throw new Error(`Failed to create comment: ${retryError.message}`);
+        }
+
+        return retryData;
+      }
+
+      // If there's an error with the author field, try without it
+      if (error.message.includes("author") && userId) {
+        console.log("Retrying without author field");
+        const { data: retryData, error: retryError } = await supabase
+          .from("comments")
+          .insert({
+            content: newComment.content,
+            parent_comment_id: newComment.parent_comment_id || null,
+            post_id: postId,
+            user_id: userId,
+          });
+
+        if (retryError) {
+          throw new Error(`Failed to create comment: ${retryError.message}`);
+        }
+
+        return retryData;
+      }
+
+      throw new Error(`Failed to create comment: ${error.message}`);
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Error in createComment:", err);
+    throw err;
   }
-
-  return data;
 };
 
 const fetchComments = async (postId: number): Promise<Comment[]> => {
@@ -108,8 +153,9 @@ export const CommentSection = ({ postId, redditStyle = false }: Props) => {
         user?.email?.split("@")[0] ||
         "Anonymous User";
 
-      console.log("Using author name:", authorName);
+      console.log("Using author name:", authorName, "and user ID:", user?.id);
 
+      // Always pass both user_id and author name for better reliability
       return createComment(newComment, postId, user?.id, authorName);
     },
     onSuccess: () => {
