@@ -254,18 +254,30 @@ const ProfilePage = () => {
     queryKey: ["userPosts", user?.id],
     queryFn: () => fetchUserPosts(user?.id || ""),
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const { data: userComments = [], isLoading: commentsLoading } = useQuery({
     queryKey: ["userComments", user?.id],
     queryFn: () => fetchUserComments(user?.id || ""),
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const { data: userLikes = [], isLoading: likesLoading } = useQuery({
     queryKey: ["userLikes", user?.id],
     queryFn: () => fetchUserLikes(user?.id || ""),
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   // Get user display name and initials - moved outside the conditional

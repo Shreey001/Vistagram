@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { PostItem } from "./PostItem";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const container = {
   hidden: { opacity: 0 },
@@ -53,12 +54,42 @@ const fetchPosts = async (): Promise<Post[]> => {
 };
 
 export const PostList = () => {
-  const { data, isLoading, error } = useQuery({
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Get cached data immediately (or undefined if not in cache)
+  const cachedData = queryClient.getQueryData<Post[]>(["posts"]);
+
+  // Use the query as normal
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
   });
 
-  if (isLoading)
+  // Prefetch posts every 5 minutes to keep cache fresh
+  useEffect(() => {
+    const prefetchInterval = setInterval(() => {
+      queryClient.prefetchQuery({
+        queryKey: ["posts"],
+        queryFn: fetchPosts,
+      });
+      console.log("Prefetched posts data");
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(prefetchInterval);
+  }, [queryClient]);
+
+  // Handle manual refresh
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setIsRefreshing(false);
+  };
+
+  // Show cached data with loading overlay if we're fetching but have cached data
+  if (isLoading && !cachedData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-gray-900/30 to-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-8">
         <motion.div
@@ -76,8 +107,9 @@ export const PostList = () => {
         </motion.h2>
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-red-900/30 to-black/40 backdrop-blur-sm rounded-xl border border-red-500/30 p-8 text-center">
         <motion.div
@@ -101,41 +133,42 @@ export const PostList = () => {
           </svg>
         </motion.div>
         <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-xl font-bold text-red-400 mb-2"
-        >
-          Error loading posts
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-gray-300"
-        >
-          {error instanceof Error ? error.message : "Something went wrong"}
-        </motion.p>
-        <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          className="text-xl font-bold text-white mb-2"
+        >
+          Error Loading Posts
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-gray-300 mb-6"
+        >
+          {error instanceof Error ? error.message : "An unknown error occurred"}
+        </motion.p>
+        <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-6 px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 rounded-full text-white font-medium shadow-lg hover:shadow-red-500/30 transition-all duration-300"
-          onClick={() => window.location.reload()}
+          onClick={() => refetch()}
+          className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white font-medium"
         >
-          Retry
+          Try Again
         </motion.button>
       </div>
     );
+  }
 
-  if (!data || data.length === 0)
+  // Use cached data while fetching, or the fresh data once loaded
+  const postsToDisplay = isFetching && cachedData ? cachedData : data;
+
+  if (!postsToDisplay || postsToDisplay.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-gray-900/30 to-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-8 text-center">
         <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 mb-4"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 mb-4"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -153,66 +186,92 @@ export const PostList = () => {
           </svg>
         </motion.div>
         <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-xl font-bold text-white mb-2"
-        >
-          No posts found
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-gray-300 mb-6"
-        >
-          Be the first to share something amazing with our community!
-        </motion.p>
-        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          className="text-xl font-bold text-white mb-2"
         >
-          <Link
-            to="/create"
-            className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-medium shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
+          No Posts Found
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-gray-300 mb-6"
+        >
+          Be the first to share something with the community!
+        </motion.p>
+        <Link to="/create">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white font-medium"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-            Create Post
-          </Link>
-        </motion.div>
+            Create a Post
+          </motion.button>
+        </Link>
       </div>
     );
+  }
 
   return (
-    <motion.div
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="space-y-6"
-    >
-      <AnimatePresence>
-        <div className="grid grid-cols-1 gap-6">
-          {data.map((post) => (
+    <div className="relative">
+      {/* Refresh button */}
+      <div className="absolute top-4 right-4 z-10">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleRefresh}
+          disabled={isRefreshing || isFetching}
+          className={`p-2 rounded-full ${
+            isRefreshing || isFetching
+              ? "bg-gray-700 text-gray-400"
+              : "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
+          } transition-colors`}
+          title="Refresh posts"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className={`w-5 h-5 ${
+              isRefreshing || isFetching ? "animate-spin" : ""
+            }`}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+            />
+          </svg>
+        </motion.button>
+      </div>
+
+      {/* Loading overlay */}
+      {(isFetching || isRefreshing) && (
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
+          <div className="bg-gray-900/80 p-4 rounded-lg flex items-center space-x-3">
+            <div className="w-6 h-6 border-2 border-t-purple-500 border-r-pink-500 border-b-purple-500 border-l-transparent rounded-full animate-spin"></div>
+            <span className="text-white text-sm">Refreshing...</span>
+          </div>
+        </div>
+      )}
+
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <AnimatePresence>
+          {postsToDisplay.map((post) => (
             <motion.div key={post.id} variants={item} layout>
               <PostItem post={post} />
             </motion.div>
           ))}
-        </div>
-      </AnimatePresence>
-    </motion.div>
+        </AnimatePresence>
+      </motion.div>
+    </div>
   );
 };
