@@ -74,7 +74,7 @@ export const PostPage = () => {
   return (
     <div className="min-h-screen bg-gray-950 pt-16">
       {/* Banner Image with Title */}
-      <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
+      <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
         <div
           className={`absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl transition-opacity duration-500 ${
             imageLoaded ? "opacity-0" : "opacity-100"
@@ -189,7 +189,7 @@ export const PostPage = () => {
         </div>
 
         {/* Post Title and Community in Banner */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -204,7 +204,7 @@ export const PostPage = () => {
                 {post.community_name}
               </Link>
             )}
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-2 sm:mb-4 leading-tight">
               {post.title}
             </h1>
             <div className="flex items-center text-gray-400 text-sm">
@@ -219,7 +219,7 @@ export const PostPage = () => {
       </div>
 
       {/* Main Content Container */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -227,7 +227,7 @@ export const PostPage = () => {
           className="bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-800 overflow-hidden"
         >
           {/* Post Content */}
-          <div className="p-6 md:p-10">
+          <div className="p-4 sm:p-6 md:p-10">
             {/* Votes Section */}
             <div className="mb-6">
               <LikeButton postId={postId} />
@@ -247,7 +247,7 @@ export const PostPage = () => {
 
           {/* Reddit-style Comment Section */}
           <div className="border-t border-gray-800 bg-gray-950">
-            <div className="p-6 md:p-10">
+            <div className="p-4 sm:p-6 md:p-10">
               <CommentSection postId={postId} redditStyle={true} />
             </div>
           </div>
@@ -264,7 +264,7 @@ export const PostPage = () => {
             <h2 className="text-2xl font-bold text-white mb-6">
               More from this community
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
               <AnimatePresence>
                 {relatedPosts.slice(0, 3).map((relatedPost) => (
                   <motion.div

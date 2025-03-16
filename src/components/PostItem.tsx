@@ -26,14 +26,14 @@ const PostItem = ({ post, compact = false }: Props) => {
       : post.content;
 
   return (
-    <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 shadow-lg rounded-lg sm:rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-xl h-full flex flex-col">
+    <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 shadow-lg rounded-md sm:rounded-lg md:rounded-xl overflow-hidden border border-purple-500/20 hover:border-pink-500/40 transition-all duration-300 hover:shadow-pink-500/10 hover:shadow-xl h-full flex flex-col">
       <Link to={`/post/${post.id}`} className="flex flex-col h-full">
         {/* Image banner */}
         <div className="relative group overflow-hidden">
           <img
             src={post.image_url}
             alt={post.title}
-            className="w-full h-40 sm:h-52 object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-32 sm:h-40 md:h-52 object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
@@ -47,10 +47,10 @@ const PostItem = ({ post, compact = false }: Props) => {
           )}
         </div>
 
-        <div className="p-3 sm:p-5 flex-grow flex flex-col">
+        <div className="p-2 sm:p-3 md:p-5 flex-grow flex flex-col">
           {/* Header: Title and Date */}
           <div className="mb-2 sm:mb-3">
-            <h2 className="text-lg sm:text-xl font-bold text-white group-hover:text-pink-400 transition-colors line-clamp-2">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-white group-hover:text-pink-400 transition-colors line-clamp-2">
               {post.title}
             </h2>
             <p className="text-xs text-gray-400 mt-1">

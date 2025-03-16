@@ -528,17 +528,41 @@ export const Navbar = () => {
                 {user ? (
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
-                      {user.user_metadata.avatar_url && (
+                      {user.user_metadata.avatar_url ? (
                         <img
                           src={user.user_metadata.avatar_url}
                           alt="avatar"
                           className="w-10 h-10 rounded-full object-cover border border-purple-500/30"
                         />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                          {getInitials()}
+                        </div>
                       )}
                       <span className="text-gray-300 font-medium">
                         {displayName}
                       </span>
                     </div>
+                    <Link
+                      to="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="w-full flex items-center justify-center space-x-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-medium py-3 px-4 rounded-lg transition-colors mb-3"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                      <span>My Profile</span>
+                    </Link>
                     <button
                       onClick={() => {
                         signOut();
