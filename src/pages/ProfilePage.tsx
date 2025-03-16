@@ -8,6 +8,7 @@ import { Post } from "../components/PostList";
 import { Comment as BaseComment } from "../components/CommentSection";
 import { PostItem } from "../components/PostItem";
 import { ProfilePictureUpload } from "../components/ProfilePictureUpload";
+import { toast } from "react-hot-toast";
 
 // Extend the Comment interface to include the posts property
 interface Comment extends BaseComment {
@@ -245,9 +246,16 @@ const fetchUserLikes = async (userId: string): Promise<Post[]> => {
 
 const ProfilePage = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"posts" | "comments" | "likes">(
-    "posts"
+  const [activeTab, setActiveTab] = useState<
+    "posts" | "comments" | "likes" | "settings"
+  >("posts");
+  const [isEditing, setIsEditing] = useState(false);
+  const [newUsername, setNewUsername] = useState(
+    user?.user_metadata?.user_name || ""
   );
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Always fetch data regardless of whether user is logged in or not
   // This ensures hooks are always called in the same order
@@ -289,6 +297,78 @@ const ProfilePage = () => {
   const getInitials = () => {
     if (!displayName) return "?";
     return displayName.charAt(0).toUpperCase();
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!user) return;
+    setIsLoading(true);
+
+    try {
+      // Update username in user metadata and database
+      if (newUsername !== user.user_metadata?.user_name) {
+        // First update the user metadata
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { user_name: newUsername },
+        });
+
+        if (updateError) throw updateError;
+
+        // Update posts table
+        const { error: postsError } = await supabase
+          .from("posts")
+          .update({ user_name: newUsername })
+          .eq("user_id", user.id);
+
+        if (postsError) throw postsError;
+
+        // Update comments table
+        const { error: commentsError } = await supabase
+          .from("comments")
+          .update({ author: newUsername })
+          .eq("user_id", user.id);
+
+        if (commentsError) throw commentsError;
+
+        // Update users table if it exists (create if it doesn't)
+        const { error: userTableError } = await supabase.from("users").upsert({
+          id: user.id,
+          user_name: newUsername,
+          email: user.email,
+          avatar_url: user.user_metadata.avatar_url,
+        });
+
+        if (userTableError && userTableError.code !== "42P01") {
+          // Ignore if table doesn't exist
+          throw userTableError;
+        }
+      }
+
+      // Update password
+      if (newPassword) {
+        if (newPassword !== confirmPassword) {
+          toast.error("New passwords don't match");
+          return;
+        }
+
+        const { error: passwordError } = await supabase.auth.updateUser({
+          password: newPassword,
+        });
+
+        if (passwordError) throw passwordError;
+      }
+
+      toast.success("Profile updated successfully");
+      setIsEditing(false);
+
+      // Refresh the page after successful update to reflect changes
+      if (newUsername !== user.user_metadata?.user_name) {
+        window.location.reload();
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update profile");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // If no user is logged in, show a message
@@ -399,6 +479,16 @@ const ProfilePage = () => {
                 }`}
               >
                 Likes
+              </button>
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`flex-1 py-4 text-center font-medium transition-colors ${
+                  activeTab === "settings"
+                    ? "text-purple-400 border-b-2 border-purple-500"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Settings
               </button>
             </div>
           </div>
@@ -613,6 +703,140 @@ const ProfilePage = () => {
                     </Link>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === "settings" && (
+              <div className="bg-gray-900/50 backdrop-blur-lg rounded-xl border border-purple-500/20 shadow-xl p-8">
+                <div className="max-w-2xl mx-auto">
+                  <h2 className="text-2xl font-bold text-white mb-6">
+                    Account Settings
+                  </h2>
+
+                  <div className="space-y-6">
+                    {/* Username Section */}
+                    <div className="bg-gray-800/50 rounded-lg p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium text-white">
+                          Username
+                        </h3>
+                        <button
+                          onClick={() => setIsEditing((prev) => !prev)}
+                          className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg transition-colors text-sm"
+                        >
+                          {isEditing ? "Cancel" : "Edit"}
+                        </button>
+                      </div>
+                      {isEditing ? (
+                        <div className="space-y-4">
+                          <input
+                            type="text"
+                            value={newUsername}
+                            onChange={(e) => setNewUsername(e.target.value)}
+                            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            placeholder="Enter new username"
+                          />
+                          <div className="flex justify-end">
+                            <button
+                              onClick={handleUpdateProfile}
+                              disabled={
+                                isLoading ||
+                                newUsername === user.user_metadata?.user_name
+                              }
+                              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {isLoading ? (
+                                <>
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                  <span>Saving...</span>
+                                </>
+                              ) : (
+                                <span>Save Username</span>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-gray-300">
+                          {user.user_metadata?.user_name || "Not set"}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Password Section */}
+                    <div className="bg-gray-800/50 rounded-lg p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium text-white">
+                          Password
+                        </h3>
+                        <button
+                          onClick={() => {
+                            if (!isEditing) {
+                              setNewPassword("");
+                              setConfirmPassword("");
+                            }
+                            setIsEditing((prev) => !prev);
+                          }}
+                          className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-3 py-1 rounded-lg transition-colors text-sm"
+                        >
+                          {isEditing ? "Cancel" : "Edit"}
+                        </button>
+                      </div>
+                      {isEditing ? (
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                              New Password
+                            </label>
+                            <input
+                              type="password"
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              placeholder="Enter new password"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
+                              Confirm New Password
+                            </label>
+                            <input
+                              type="password"
+                              value={confirmPassword}
+                              onChange={(e) =>
+                                setConfirmPassword(e.target.value)
+                              }
+                              className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              placeholder="Confirm new password"
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              onClick={handleUpdateProfile}
+                              disabled={
+                                isLoading ||
+                                !newPassword ||
+                                newPassword !== confirmPassword
+                              }
+                              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {isLoading ? (
+                                <>
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                  <span>Saving...</span>
+                                </>
+                              ) : (
+                                <span>Save Password</span>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-gray-300">••••••••</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
