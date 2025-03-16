@@ -42,8 +42,11 @@ const fetchPostsByCommunity = async (communityId: number): Promise<Post[]> => {
 export const AllPostsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(9); // Show 9 posts per page (3 rows of 3)
-  const [selectedCommunity, setSelectedCommunity] = useState<number | null>(null);
-  
+  const [selectedCommunity, setSelectedCommunity] = useState<number | null>(
+    null
+  );
+  const [loadingProgress, setLoadingProgress] = useState(0);
+
   // Reset page when community filter changes
   useEffect(() => {
     setCurrentPage(1);
@@ -58,8 +61,39 @@ export const AllPostsPage = () => {
   // Fetch posts based on selected community
   const { data, isLoading, error } = useQuery({
     queryKey: ["posts", selectedCommunity],
-    queryFn: () => selectedCommunity ? fetchPostsByCommunity(selectedCommunity) : fetchPosts(),
+    queryFn: () =>
+      selectedCommunity
+        ? fetchPostsByCommunity(selectedCommunity)
+        : fetchPosts(),
   });
+
+  // Simulate loading progress
+  useEffect(() => {
+    let interval: number | undefined;
+
+    if (isLoading || communitiesLoading) {
+      setLoadingProgress(0);
+      let progress = 0;
+
+      interval = window.setInterval(() => {
+        // Increment faster at the beginning, slower as it approaches 90%
+        const increment =
+          progress < 30 ? 5 : progress < 60 ? 3 : progress < 80 ? 1 : 0.5;
+        progress = Math.min(progress + increment, 90);
+        setLoadingProgress(progress);
+      }, 150);
+    } else {
+      setLoadingProgress(100);
+      // Quick transition to 100% when loading completes
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 500);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isLoading, communitiesLoading]);
 
   // Get current posts for pagination
   const indexOfLastPost = currentPage * postsPerPage;
@@ -75,7 +109,7 @@ export const AllPostsPage = () => {
     pageNumbers.push(i);
   }
 
-  if (isLoading)
+  if (isLoading || communitiesLoading)
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
@@ -104,12 +138,23 @@ export const AllPostsPage = () => {
                 </svg>
               </Link>
             </div>
-            
+
             {/* Community Filter - Loading State */}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-2">
               <div className="w-full max-w-xs">
-                <div className="animate-pulse bg-gray-700 h-10 rounded-lg w-full"></div>
+                <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${loadingProgress}%` }}
+                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  />
+                </div>
+                <div className="mt-2 flex justify-between text-xs text-gray-400">
+                  <span>Loading communities...</span>
+                  <span>{Math.round(loadingProgress)}%</span>
+                </div>
               </div>
+              <div className="animate-pulse bg-gray-700 h-10 rounded-lg w-full max-w-xs mt-2"></div>
             </div>
           </div>
 
@@ -155,23 +200,29 @@ export const AllPostsPage = () => {
                 </svg>
               </Link>
             </div>
-            
+
             {/* Community Filter */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
                 <button
                   onClick={() => setSelectedCommunity(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${!selectedCommunity 
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' 
-                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/70'}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                    !selectedCommunity
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
+                      : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
+                  }`}
                 >
                   All Communities
                 </button>
-                
+
                 {communitiesLoading ? (
                   <div className="flex gap-2">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className="animate-pulse bg-gray-700 h-9 w-28 rounded-full" style={{ animationDelay: `${i * 100}ms` }}></div>
+                      <div
+                        key={i}
+                        className="animate-pulse bg-gray-700 h-9 w-28 rounded-full"
+                        style={{ animationDelay: `${i * 100}ms` }}
+                      ></div>
                     ))}
                   </div>
                 ) : (
@@ -179,9 +230,11 @@ export const AllPostsPage = () => {
                     <button
                       key={community.id}
                       onClick={() => setSelectedCommunity(community.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${selectedCommunity === community.id 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' 
-                        : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/70'}`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                        selectedCommunity === community.id
+                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
+                          : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
+                      }`}
                     >
                       {community.name}
                     </button>
@@ -254,23 +307,29 @@ export const AllPostsPage = () => {
                 </svg>
               </Link>
             </div>
-            
+
             {/* Community Filter */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
                 <button
                   onClick={() => setSelectedCommunity(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${!selectedCommunity 
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' 
-                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/70'}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                    !selectedCommunity
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
+                      : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
+                  }`}
                 >
                   All Communities
                 </button>
-                
+
                 {communitiesLoading ? (
                   <div className="flex gap-2">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className="animate-pulse bg-gray-700 h-9 w-28 rounded-full" style={{ animationDelay: `${i * 100}ms` }}></div>
+                      <div
+                        key={i}
+                        className="animate-pulse bg-gray-700 h-9 w-28 rounded-full"
+                        style={{ animationDelay: `${i * 100}ms` }}
+                      ></div>
                     ))}
                   </div>
                 ) : (
@@ -278,9 +337,11 @@ export const AllPostsPage = () => {
                     <button
                       key={community.id}
                       onClick={() => setSelectedCommunity(community.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${selectedCommunity === community.id 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' 
-                        : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/70'}`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                        selectedCommunity === community.id
+                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
+                          : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
+                      }`}
                     >
                       {community.name}
                     </button>
@@ -307,7 +368,9 @@ export const AllPostsPage = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No posts found</h3>
+            <h3 className="text-xl font-bold text-white mb-2">
+              No posts found
+            </h3>
             <p className="text-gray-300 mb-6">
               Be the first to share something amazing with our community!
             </p>
@@ -364,7 +427,7 @@ export const AllPostsPage = () => {
               </svg>
             </Link>
           </div>
-          
+
           {/* Community Filter */}
           <div className="flex items-center gap-4">
             <div className="w-full max-w-xs">
@@ -373,7 +436,11 @@ export const AllPostsPage = () => {
               ) : (
                 <select
                   value={selectedCommunity || ""}
-                  onChange={(e) => setSelectedCommunity(e.target.value ? Number(e.target.value) : null)}
+                  onChange={(e) =>
+                    setSelectedCommunity(
+                      e.target.value ? Number(e.target.value) : null
+                    )
+                  }
                   className="w-full px-4 py-2 rounded-lg bg-gray-800/50 border border-purple-500/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
                 >
                   <option value="">All Communities</option>
@@ -391,8 +458,18 @@ export const AllPostsPage = () => {
                 className="px-3 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-1 text-sm"
               >
                 <span>Clear Filter</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
@@ -434,7 +511,9 @@ export const AllPostsPage = () => {
             <div className="flex justify-center mt-8">
               <nav className="flex items-center space-x-2">
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                   className={`px-3 py-1 rounded-md ${
                     currentPage === 1

@@ -22,12 +22,41 @@ export const Home = () => {
   const [selectedCommunity, setSelectedCommunity] = useState<number | null>(
     null
   );
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   // Fetch all communities for the filter
   const { data: communities, isLoading: communitiesLoading } = useQuery({
     queryKey: ["home-communities"],
     queryFn: fetchCommunities,
   });
+
+  // Simulate loading progress for communities
+  useEffect(() => {
+    let interval: number | undefined;
+
+    if (communitiesLoading) {
+      setLoadingProgress(0);
+      let progress = 0;
+
+      interval = window.setInterval(() => {
+        // Increment faster at the beginning, slower as it approaches 90%
+        const increment =
+          progress < 30 ? 5 : progress < 60 ? 3 : progress < 80 ? 1 : 0.5;
+        progress = Math.min(progress + increment, 90);
+        setLoadingProgress(progress);
+      }, 150);
+    } else {
+      setLoadingProgress(100);
+      // Quick transition to 100% when loading completes
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 500);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [communitiesLoading]);
 
   return (
     <div className="w-full">
@@ -226,30 +255,43 @@ export const Home = () => {
               </div>
 
               {/* Community Filter - Redesigned */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
-                <button
-                  onClick={() => setSelectedCommunity(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-                    !selectedCommunity
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
-                      : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
-                  }`}
-                >
-                  All Communities
-                </button>
-
-                {communitiesLoading ? (
-                  <div className="flex gap-2">
-                    {[...Array(5)].map((_, i) => (
+              {communitiesLoading ? (
+                <div className="flex flex-col gap-2 w-full max-w-md">
+                  <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${loadingProgress}%` }}
+                      className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    />
+                  </div>
+                  <div className="mt-1 flex justify-between text-xs text-gray-400">
+                    <span>Loading communities...</span>
+                    <span>{Math.round(loadingProgress)}%</span>
+                  </div>
+                  <div className="flex mt-2 gap-2">
+                    {[...Array(4)].map((_, i) => (
                       <div
                         key={i}
-                        className="animate-pulse bg-gray-700 h-9 w-28 rounded-full"
+                        className="animate-pulse bg-gray-800/50 h-10 rounded-full w-32"
                         style={{ animationDelay: `${i * 100}ms` }}
                       ></div>
                     ))}
                   </div>
-                ) : (
-                  communities?.map((community) => (
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-500/30 scrollbar-track-transparent">
+                  <button
+                    onClick={() => setSelectedCommunity(null)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                      !selectedCommunity
+                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20"
+                        : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/70"
+                    }`}
+                  >
+                    All Communities
+                  </button>
+
+                  {communities?.map((community) => (
                     <button
                       key={community.id}
                       onClick={() => setSelectedCommunity(community.id)}
@@ -261,9 +303,9 @@ export const Home = () => {
                     >
                       {community.name}
                     </button>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="bg-gray-900/30 p-6 rounded-2xl shadow-lg border border-purple-500/20">
@@ -433,6 +475,7 @@ const HomepagePostList = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(6); // Show 6 posts per page (3 rows of 2)
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   // Reset page when community filter changes
   useEffect(() => {
@@ -447,6 +490,34 @@ const HomepagePostList = ({
         ? fetchPostsByCommunity(selectedCommunity)
         : fetchPosts(),
   });
+
+  // Simulate loading progress
+  useEffect(() => {
+    let interval: number | undefined;
+
+    if (isLoading) {
+      setLoadingProgress(0);
+      let progress = 0;
+
+      interval = window.setInterval(() => {
+        // Increment faster at the beginning, slower as it approaches 90%
+        const increment =
+          progress < 30 ? 5 : progress < 60 ? 3 : progress < 80 ? 1 : 0.5;
+        progress = Math.min(progress + increment, 90);
+        setLoadingProgress(progress);
+      }, 150);
+    } else {
+      setLoadingProgress(100);
+      // Quick transition to 100% when loading completes
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 500);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isLoading]);
 
   // Get current posts for pagination
   const indexOfLastPost = currentPage * postsPerPage;
@@ -464,14 +535,30 @@ const HomepagePostList = ({
 
   if (isLoading)
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="bg-gray-800/30 rounded-xl h-72 animate-pulse"
-            style={{ animationDelay: `${i * 100}ms` }}
-          ></div>
-        ))}
+      <div className="flex flex-col gap-6">
+        <div className="w-full max-w-md mb-2">
+          <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${loadingProgress}%` }}
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-xs text-gray-400">
+            <span>Loading posts...</span>
+            <span>{Math.round(loadingProgress)}%</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-gray-800/30 rounded-xl h-72 animate-pulse"
+              style={{ animationDelay: `${i * 100}ms` }}
+            ></div>
+          ))}
+        </div>
       </div>
     );
 

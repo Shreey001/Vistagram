@@ -56,6 +56,7 @@ const fetchPosts = async (): Promise<Post[]> => {
 export const PostList = () => {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   // Get cached data immediately (or undefined if not in cache)
   const cachedData = queryClient.getQueryData<Post[]>(["posts"]);
@@ -67,6 +68,34 @@ export const PostList = () => {
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours
   });
+
+  // Simulate loading progress
+  useEffect(() => {
+    let interval: number | undefined;
+
+    if (isLoading && !cachedData) {
+      setLoadingProgress(0);
+      let progress = 0;
+
+      interval = window.setInterval(() => {
+        // Increment faster at the beginning, slower as it approaches 90%
+        const increment =
+          progress < 30 ? 5 : progress < 60 ? 3 : progress < 80 ? 1 : 0.5;
+        progress = Math.min(progress + increment, 90);
+        setLoadingProgress(progress);
+      }, 150);
+    } else if (!isLoading) {
+      setLoadingProgress(100);
+      // Quick transition to 100% when loading completes
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 500);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isLoading, cachedData]);
 
   // Prefetch posts every 5 minutes to keep cache fresh
   useEffect(() => {
@@ -92,6 +121,20 @@ export const PostList = () => {
   if (isLoading && !cachedData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-gray-900/30 to-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-8">
+        <div className="w-full max-w-md mb-8">
+          <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${loadingProgress}%` }}
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-xs text-gray-400">
+            <span>Loading posts...</span>
+            <span>{Math.round(loadingProgress)}%</span>
+          </div>
+        </div>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -248,12 +291,23 @@ export const PostList = () => {
         </motion.button>
       </div>
 
-      {/* Loading overlay */}
+      {/* Loading overlay with percentage */}
       {(isFetching || isRefreshing) && (
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
-          <div className="bg-gray-900/80 p-4 rounded-lg flex items-center space-x-3">
-            <div className="w-6 h-6 border-2 border-t-purple-500 border-r-pink-500 border-b-purple-500 border-l-transparent rounded-full animate-spin"></div>
-            <span className="text-white text-sm">Refreshing...</span>
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-10">
+          <div className="bg-gray-900/80 p-4 rounded-lg flex flex-col items-center space-y-3 w-64">
+            <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${loadingProgress}%` }}
+                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+              />
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-6 h-6 border-2 border-t-purple-500 border-r-pink-500 border-b-purple-500 border-l-transparent rounded-full animate-spin"></div>
+              <span className="text-white text-sm">
+                Refreshing... {Math.round(loadingProgress)}%
+              </span>
+            </div>
           </div>
         </div>
       )}
