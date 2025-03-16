@@ -24,25 +24,21 @@ export interface Post {
   id: number;
   title: string;
   content: string;
-  image_url: string;
+  image_url?: string;
   created_at: string;
-  avatar_url: string | null;
-  comment_count?: number;
-  like_count?: number;
-  user_name?: string;
+  user_id: string;
+  user_name: string;
   community_id?: number;
-  community_name?: string;
-  communities?:
-    | {
-        id: number;
-        name: string;
-        description?: string;
-      }
-    | Array<{
-        id: number;
-        name: string;
-        description?: string;
-      }>;
+  communities?: {
+    id: number;
+    name: string;
+  };
+  comments?: {
+    id: number;
+    content: string;
+    created_at: string;
+  }[];
+  votes?: number;
 }
 
 const fetchPosts = async (): Promise<Post[]> => {

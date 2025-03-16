@@ -102,40 +102,38 @@ export const ProfilePictureUpload = () => {
     fileInputRef.current?.click();
   };
 
+  const getInitials = () => {
+    if (!user || !user.user_metadata) return "?";
+    const { first_name, last_name } = user.user_metadata;
+    if (first_name && last_name) {
+      return (first_name[0] + last_name[0]).toUpperCase();
+    }
+    return "?";
+  };
+
   return (
     <div className="relative group">
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/jpeg,image/png,image/gif,image/webp"
-        className="hidden"
-      />
-
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={triggerFileInput}
-        className={`relative cursor-pointer ${isUploading ? "opacity-50" : ""}`}
+      {user?.user_metadata?.avatar_url ? (
+        <img
+          src={user.user_metadata.avatar_url}
+          alt="Profile"
+          className="w-32 h-32 rounded-full border-4 border-purple-500/20 object-cover shadow-xl"
+        />
+      ) : (
+        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-4xl font-bold border-4 border-purple-500/20 shadow-xl">
+          {getInitials()}
+        </div>
+      )}
+      <label
+        htmlFor="avatar-upload"
+        className="absolute inset-0 flex items-center justify-center rounded-full cursor-pointer bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        {user?.user_metadata?.avatar_url ? (
-          <img
-            src={user.user_metadata.avatar_url}
-            alt="Profile"
-            className="w-24 h-24 rounded-full object-cover border-4 border-purple-500/30"
-          />
-        ) : (
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold border-4 border-purple-500/30">
-            {user?.email?.[0].toUpperCase() || "?"}
-          </div>
-        )}
-
-        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="text-white text-center">
           <svg
-            className="w-8 h-8 text-white"
+            className="w-8 h-8 mx-auto mb-1"
             fill="none"
-            viewBox="0 0 24 24"
             stroke="currentColor"
+            viewBox="0 0 24 24"
           >
             <path
               strokeLinecap="round"
@@ -150,15 +148,21 @@ export const ProfilePictureUpload = () => {
               d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
+          <span className="text-sm">Change Photo</span>
         </div>
-      </motion.div>
-
+      </label>
+      <input
+        type="file"
+        id="avatar-upload"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
       {isUploading && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/70">
+        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50">
           <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
-
       {uploadError && (
         <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-red-500 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap">
           {uploadError}
