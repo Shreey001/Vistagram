@@ -1,117 +1,163 @@
-# Vistagram
+# 📸 Vistagram
 
-Vistagram is a modern social media platform built with React, TypeScript, Vite, and Supabase. It allows users to create posts with rich text editing, join communities, and engage with content through likes and comments.
+<div align="center">
+  <img src="public/vistagram-logo.png" alt="Vistagram Logo" width="200"/>
+  
+  <p align="center">
+    A modern social media platform built with React, Supabase, and TailwindCSS
+  </p>
 
-## Features
+  <p>
+    <a href="https://github.com/yourusername/vistagram/stargazers">
+      <img src="https://img.shields.io/github/stars/yourusername/vistagram?style=for-the-badge" alt="GitHub stars"/>
+    </a>
+    <a href="https://github.com/yourusername/vistagram/network/members">
+      <img src="https://img.shields.io/github/forks/yourusername/vistagram?style=for-the-badge" alt="GitHub forks"/>
+    </a>
+    <a href="https://github.com/yourusername/vistagram/issues">
+      <img src="https://img.shields.io/github/issues/yourusername/vistagram?style=for-the-badge" alt="GitHub issues"/>
+    </a>
+    <a href="https://github.com/yourusername/vistagram/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/yourusername/vistagram?style=for-the-badge" alt="GitHub license"/>
+    </a>
+  </p>
 
-- Rich text editing for post creation
-- Community creation and management
-- User authentication via Supabase
-- Responsive design using Tailwind CSS
-- Real-time comments and likes
-- Modern UI with animations using Framer Motion
+  <p>
+    <a href="#demo">View Demo</a>
+    ·
+    <a href="#features">Features</a>
+    ·
+    <a href="#installation">Installation</a>
+    ·
+    <a href="#contributing">Contributing</a>
+  </p>
+</div>
 
-## Technologies Used
+## ✨ Features
 
-- React 19 with ES modules
-- TypeScript
-- Vite for bundling
-- Supabase for backend and authentication
-- TailwindCSS for styling
-- Framer Motion for animations
-- React Router v7 for routing
-- React Query for data fetching
-- TipTap for rich text editing
+- 🔐 **Secure Authentication** - Email/Password and Social login options
+- 📱 **Responsive Design** - Beautiful UI that works on all devices
+- 🖼️ **Image Upload** - Upload and share images with the community
+- 💬 **Real-time Comments** - Engage with posts through comments
+- ❤️ **Like System** - Show appreciation for posts you enjoy
+- 👤 **User Profiles** - Customizable user profiles with cover photos
+- 🎨 **Modern UI/UX** - Built with TailwindCSS and Framer Motion
+- 🔍 **Search Functionality** - Find posts and users easily
+- 📊 **Analytics** - Track post engagement and user interactions
 
-## Getting Started
+## 🎯 Demo
 
-### Prerequisites
+<div align="center">
+  <img src="public/demo.gif" alt="Vistagram Demo" width="600"/>
+</div>
 
-- Node.js 18+ (recommended)
-- npm or yarn
+### Live Demo
 
-### Installation
+Check out the live demo: [Vistagram Demo](https://vistagram.vercel.app)
 
-1. Clone the repository:
+## 🚀 Tech Stack
+
+- ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+- ![Supabase](https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white)
+- ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+- ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+- ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+
+## 📦 Installation
+
+1. **Clone the repository**
 
    ```bash
    git clone https://github.com/yourusername/vistagram.git
    cd vistagram
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
 
    ```bash
    npm install
    ```
 
-3. Set up environment variables:
+3. **Set up environment variables**
 
-   - Copy `.env.example` to `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Fill in your Supabase credentials in the `.env` file
+   ```bash
+   cp .env.example .env
+   ```
 
-4. Start the development server:
+   Fill in your Supabase credentials in the `.env` file:
+
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Start the development server**
    ```bash
    npm run dev
    ```
 
-## Deployment to Vercel
+## 📝 Environment Variables
 
-### Automatic Deployment
+| Variable                 | Description                 |
+| ------------------------ | --------------------------- |
+| `VITE_SUPABASE_URL`      | Your Supabase project URL   |
+| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key |
 
-1. Push your code to a GitHub repository
-2. Connect your GitHub repository to Vercel
-3. Add the environment variables (`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`) in the Vercel project settings
-4. Deploy
+## 🗄️ Database Schema
 
-### Manual Deployment
+### Users Table
 
-1. Install Vercel CLI:
+```sql
+create table public.users (
+  id uuid references auth.users on delete cascade,
+  username text unique,
+  avatar_url text,
+  cover_url text,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+```
 
-   ```bash
-   npm install -g vercel
-   ```
+### Posts Table
 
-2. Login to Vercel:
+```sql
+create table public.posts (
+  id bigint generated by default as identity primary key,
+  user_id uuid references public.users on delete cascade,
+  title text,
+  content text,
+  image_url text,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+```
 
-   ```bash
-   vercel login
-   ```
+## 🤝 Contributing
 
-3. Deploy to Vercel:
+Contributions are welcome! Here's how you can help:
 
-   ```bash
-   vercel
-   ```
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-4. For production deployment:
-   ```bash
-   vercel --prod
-   ```
+## 📄 License
 
-## Environment Variables
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The following environment variables are required:
+## 👥 Authors
 
-- `VITE_SUPABASE_URL`: Your Supabase project URL
-- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
+- **Your Name** - _Initial work_ - [@yourusername](https://github.com/yourusername)
 
-## Project Structure
+## 🙏 Acknowledgments
 
-- `src/` - Source code
-  - `components/` - React components
-  - `pages/` - Page components
-  - `context/` - React contexts
-  - `hooks/` - Custom React hooks
-  - `services/` - API services
-  - `styles/` - CSS styles
-  - `types/` - TypeScript types
-  - `utils/` - Utility functions
-- `public/` - Static assets
+- [Supabase](https://supabase.io/) for the amazing backend service
+- [TailwindCSS](https://tailwindcss.com/) for the utility-first CSS framework
+- [Framer Motion](https://www.framer.com/motion/) for smooth animations
+- [React Query](https://react-query.tanstack.com/) for data fetching
+- [React Hot Toast](https://react-hot-toast.com/) for beautiful notifications
 
-## License
+---
 
-This project is licensed under the MIT License.
+<div align="center">
+  Made with ❤️ by <a href="https://github.com/yourusername">Your Name</a>
+</div>
