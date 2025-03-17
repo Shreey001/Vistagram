@@ -1,7 +1,7 @@
 # 📸 Vistagram
 
 <div align="center">
-  <img src="public/vistagram-logo.png" alt="Vistagram Logo" width="200"/>
+  <img src="public/vistagram-logo.svg" alt="Vistagram Logo" width="200"/>
   
   <p align="center">
     A modern social media platform built with React, Supabase, and TailwindCSS
@@ -68,7 +68,7 @@ Check out the live demo: [Vistagram Demo](https://vistagram.vercel.app)
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/vistagram.git
+   git clone https://github.com/Shreey001/vistagram.git
    cd vistagram
    ```
 
@@ -146,7 +146,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- **Your Name** - _Initial work_ - [@yourusername](https://github.com/yourusername)
+- **Shreejan** - _Initial work_ - [@Shreey001](https://github.com/Shreey001)
 
 ## 🙏 Acknowledgments
 
@@ -159,5 +159,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  Made with ❤️ by <a href="https://github.com/yourusername">Your Name</a>
+  Made with ❤️ by <a href="https://github.com/yourusername">Shreejan</a>
 </div>
