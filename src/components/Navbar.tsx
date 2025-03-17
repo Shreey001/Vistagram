@@ -1,8 +1,8 @@
 import { Link, NavLink as RouterNavLink, useLocation } from "react-router-dom";
-import logo from "../assets/logo.svg";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { AnimatedLogo } from "./AnimatedLogo";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -93,18 +93,7 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
-            <motion.img
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-transparent group-hover:border-pink-500 transition-all duration-300"
-              src={logo}
-              alt="logo"
-            />
-            <span className="text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
-              Vistagram
-            </span>
-          </Link>
+          <AnimatedLogo />
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-3">

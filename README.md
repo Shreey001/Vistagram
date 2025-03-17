@@ -45,12 +45,6 @@
 - 🔍 **Search Functionality** - Find posts and users easily
 - 📊 **Analytics** - Track post engagement and user interactions
 
-## 🎯 Demo
-
-<div align="center">
-  <img src="public/demo.gif" alt="Vistagram Demo" width="600"/>
-</div>
-
 ### Live Demo
 
 Check out the live demo: [Vistagram Demo](https://vistagram.vercel.app)
