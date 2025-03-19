@@ -45,7 +45,6 @@ export const AllPostsPage = () => {
   const [selectedCommunity, setSelectedCommunity] = useState<number | null>(
     null
   );
-  const [loadingProgress, setLoadingProgress] = useState(0);
 
   // Reset page when community filter changes
   useEffect(() => {
@@ -66,34 +65,6 @@ export const AllPostsPage = () => {
         ? fetchPostsByCommunity(selectedCommunity)
         : fetchPosts(),
   });
-
-  // Simulate loading progress
-  useEffect(() => {
-    let interval: number | undefined;
-
-    if (isLoading || communitiesLoading) {
-      setLoadingProgress(0);
-      let progress = 0;
-
-      interval = window.setInterval(() => {
-        // Increment faster at the beginning, slower as it approaches 90%
-        const increment =
-          progress < 30 ? 5 : progress < 60 ? 3 : progress < 80 ? 1 : 0.5;
-        progress = Math.min(progress + increment, 90);
-        setLoadingProgress(progress);
-      }, 150);
-    } else {
-      setLoadingProgress(100);
-      // Quick transition to 100% when loading completes
-      setTimeout(() => {
-        clearInterval(interval);
-      }, 500);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isLoading, communitiesLoading]);
 
   // Get current posts for pagination
   const indexOfLastPost = currentPage * postsPerPage;
@@ -141,19 +112,6 @@ export const AllPostsPage = () => {
 
             {/* Community Filter - Loading State */}
             <div className="flex flex-col gap-2">
-              <div className="w-full max-w-xs">
-                <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${loadingProgress}%` }}
-                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                  />
-                </div>
-                <div className="mt-2 flex justify-between text-xs text-gray-400">
-                  <span>Loading communities...</span>
-                  <span>{Math.round(loadingProgress)}%</span>
-                </div>
-              </div>
               <div className="animate-pulse bg-gray-700 h-10 rounded-lg w-full max-w-xs mt-2"></div>
             </div>
           </div>
