@@ -167,7 +167,6 @@ export const Home = () => {
           </div>
         </div>
       </motion.section>
-
       {/* Main Content Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-10">
@@ -277,11 +276,171 @@ export const Home = () => {
                   ))}
                 </div>
               )}
+
+              <div className="bg-gray-900/30 p-6 rounded-2xl shadow-lg border border-purple-500/20">
+                <HomepagePostList selectedCommunity={selectedCommunity} />
+              </div>
             </div>
 
-            <div className="bg-gray-900/30 p-6 rounded-2xl shadow-lg border border-purple-500/20">
-              <HomepagePostList selectedCommunity={selectedCommunity} />
-            </div>
+            {/* AI Feature Announcement Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="relative py-12 bg-gradient-to-r from-purple-900/20 via-black to-pink-900/20 rounded-2xl overflow-hidden border border-purple-500/20"
+            >
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                  {/* Left Content */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="space-y-6"
+                  >
+                    <div className="inline-block px-4 py-1 bg-purple-500/10 rounded-full border border-purple-500/20">
+                      <span className="text-purple-400 font-medium">
+                        NEW FEATURE
+                      </span>
+                    </div>
+
+                    <h2 className="text-3xl lg:text-4xl font-bold">
+                      <span className="text-white">Create Posts with </span>
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+                        AI Magic
+                      </span>
+                    </h2>
+
+                    <p className="text-lg text-gray-300">
+                      Experience the future of content creation with our new
+                      AI-powered post generator. Transform your ideas into
+                      stunning visual stories in seconds.
+                    </p>
+
+                    <div className="flex flex-wrap gap-4">
+                      <Link
+                        to="/create-ai"
+                        className="inline-flex items-center  gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                      >
+                        Try AI Creation
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 7l5 5m0 0l-5 5m5-5H6"
+                          />
+                        </svg>
+                      </Link>
+                      <Link
+                        to="/about"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 text-white font-semibold rounded-lg border border-white/10 hover:bg-white/10 transition-all duration-300"
+                      >
+                        Learn More
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </Link>
+                    </div>
+                  </motion.div>
+
+                  {/* Right Content - Stacked AI Style Cards */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="relative"
+                  >
+                    <div className="relative grid grid-cols-2 gap-4">
+                      {/* Disney Pixar Style Card */}
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="rounded-2xl overflow-hidden aspect-[4/3] relative group"
+                      >
+                        <img
+                          src="https://images.unsplash.com/photo-1637858868799-7f26a0640eb6"
+                          alt="Disney Pixar Style"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="absolute bottom-4 left-4">
+                            <h3 className="text-white font-bold">
+                              Disney Pixar
+                            </h3>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Script to Video Card */}
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="rounded-2xl overflow-hidden aspect-[4/3] relative group"
+                      >
+                        <img
+                          src="https://images.unsplash.com/photo-1518544801976-3e159e50e5bb"
+                          alt="Script to Video"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="absolute bottom-4 left-4">
+                            <h3 className="text-white font-bold">Script</h3>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Generative AI Card */}
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="rounded-2xl overflow-hidden aspect-[4/3] relative group"
+                      >
+                        <img
+                          src="https://images.unsplash.com/photo-1677442136019-21780ecad995"
+                          alt="Generative AI"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="absolute bottom-4 left-4">
+                            <h3 className="text-white font-bold">Generative</h3>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Cinematic Card */}
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="rounded-2xl overflow-hidden aspect-[4/3] relative group"
+                      >
+                        <img
+                          src="https://images.unsplash.com/photo-1485846234645-a62644f84728"
+                          alt="Cinematic"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="absolute bottom-4 left-4">
+                            <h3 className="text-white font-bold">Cinematic</h3>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Communities Section - Moved from sidebar to below posts */}
