@@ -641,9 +641,41 @@ const HomepagePostList = ({
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="bg-gray-800/30 rounded-xl h-72 animate-pulse"
-              style={{ animationDelay: `${i * 100}ms` }}
-            ></div>
+              className="relative bg-gray-800/60 rounded-xl h-72 animate-pulse overflow-hidden"
+              style={{
+                animationDelay: `${i * 100}ms`,
+              }}
+            >
+              {/* Shimmer effect overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_2s_infinite]"></div>
+
+              {/* Content skeleton */}
+              <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  {/* Title skeleton */}
+                  <div className="h-6 bg-white/20 rounded-md w-3/4"></div>
+                  {/* Description skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-4 bg-white/15 rounded-md w-full"></div>
+                    <div className="h-4 bg-white/15 rounded-md w-5/6"></div>
+                  </div>
+                </div>
+
+                {/* Bottom content skeleton */}
+                <div className="space-y-2">
+                  {/* Tags skeleton */}
+                  <div className="flex gap-2">
+                    <div className="h-5 bg-white/20 rounded-full w-16"></div>
+                    <div className="h-5 bg-white/20 rounded-full w-20"></div>
+                  </div>
+                  {/* Author skeleton */}
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 bg-white/20 rounded-full"></div>
+                    <div className="h-4 bg-white/20 rounded-md w-24"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
