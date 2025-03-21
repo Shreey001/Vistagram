@@ -220,7 +220,6 @@ export const CreateAIPost = () => {
           details: err.details,
           hint: err.hint,
           code: err.code,
-          status: err.status,
         });
 
         // More specific error messages
@@ -235,13 +234,8 @@ export const CreateAIPost = () => {
         }
       }
     } catch (err: any) {
-      console.error("Detailed error:", {
-        message: err.message,
-        details: err.details,
-        hint: err.hint,
-        code: err.code,
-      });
-      setError(err.message || "Failed to create post. Please try again.");
+      console.error("Error in image processing:", err);
+      setError(err.message || "Failed to process image. Please try again.");
     }
   };
 
