@@ -10,6 +10,12 @@ interface AIGeneratedImage {
   prompt: string;
 }
 
+interface CustomError extends Error {
+  code?: string;
+  details?: string;
+  hint?: string;
+}
+
 export const CreateAIPost = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -31,23 +37,23 @@ export const CreateAIPost = () => {
     setIsGenerating(true);
     setError(null);
 
+    const encodedParams = new URLSearchParams();
+    encodedParams.set("prompt", prompt);
+    encodedParams.set("width", "1024");
+    encodedParams.set("height", "1024");
+    encodedParams.set("seed", Math.floor(Math.random() * 1000000).toString());
+    encodedParams.set("model", "flux");
+
     const options = {
-      method: "GET",
+      method: "POST",
       url: "https://ai-text-to-image-generator-flux-free-api.p.rapidapi.com/aaaaaaaaaaaaaaaaaiimagegenerator/fluximagegenerate/generateimage.php",
-      params: {
-        prompt: prompt,
-        width: "1024",
-        height: "1024",
-        model: "flux-pro",
-      },
       headers: {
-        Accept: "application/json",
-        "Content-Type": null,
-        "x-rapidapi-ua": "RapidAPI-Playground",
         "x-rapidapi-key": "96c38dda83msh112af688d4b9555p1d9298jsn99ea2d122976",
         "x-rapidapi-host":
           "ai-text-to-image-generator-flux-free-api.p.rapidapi.com",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
+      data: encodedParams,
       responseType: "arraybuffer" as const,
     };
 
@@ -214,28 +220,30 @@ export const CreateAIPost = () => {
 
         // Navigate to the home page after successful post creation
         navigate("/");
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as CustomError;
         console.error("Detailed error:", {
-          message: err.message,
-          details: err.details,
-          hint: err.hint,
-          code: err.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
         });
 
         // More specific error messages
-        if (err.code === "23505") {
+        if (error.code === "23505") {
           setError("A post with this title already exists.");
-        } else if (err.code === "23503") {
+        } else if (error.code === "23503") {
           setError("There was an issue with the user reference.");
-        } else if (err.message.includes("too large")) {
+        } else if (error.message?.includes("too large")) {
           setError("The image is too large. Please try with a shorter prompt.");
         } else {
-          setError(err.message || "Failed to create post. Please try again.");
+          setError(error.message || "Failed to create post. Please try again.");
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error in image processing:", err);
-      setError(err.message || "Failed to process image. Please try again.");
+      const error = err as CustomError;
+      setError(error.message || "Failed to process image. Please try again.");
     }
   };
 
