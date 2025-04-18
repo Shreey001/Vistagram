@@ -8,18 +8,27 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PostItem } from "../components/PostItem";
 
+// Extend the Post interface with additional properties
+interface ExtendedPost extends Omit<Post, "user_name"> {
+  community_name?: string;
+  community_id?: number;
+  avatar_url?: string;
+  user_name?: string;
+  user_id: string;
+}
+
 export const PostPage = () => {
   const { id } = useParams<{ id: string }>();
   const postId = Number(id);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
 
-  // Fetch post data
+  // Update the type to ExtendedPost
   const {
     data: post,
     isLoading,
     error,
-  } = useQuery<Post, Error>({
+  } = useQuery<ExtendedPost, Error>({
     queryKey: ["post", postId],
     queryFn: () => fetchPostById(postId),
     enabled: !!postId,
@@ -207,11 +216,28 @@ export const PostPage = () => {
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-2 sm:mb-4 leading-tight">
               {post.title}
             </h1>
-            <div className="flex items-center text-gray-400 text-sm">
-              <span>{formatDate(post.created_at)}</span>
-              <span className="mx-2">•</span>
-              <div className="flex items-center">
-                <LikeButton postId={postId} minimal={true} />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <img
+                  src={
+                    post.avatar_url ||
+                    `https://api.dicebear.com/7.x/avatars/svg?seed=${post.user_id}`
+                  }
+                  alt={post.user_name || "User"}
+                  className="w-10 h-10 rounded-full border-2 border-purple-500/30 object-cover"
+                />
+                <div>
+                  <p className="text-white font-medium">
+                    {post.user_name || "Anonymous"}
+                  </p>
+                  <div className="flex items-center text-gray-400 text-sm">
+                    <span>{formatDate(post.created_at)}</span>
+                    <span className="mx-2">•</span>
+                    <div className="flex items-center">
+                      <LikeButton postId={postId} minimal={true} />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -353,7 +379,7 @@ const formatDate = (date: string) => {
   });
 };
 
-const fetchPostById = async (id: number): Promise<Post> => {
+const fetchPostById = async (id: number): Promise<ExtendedPost> => {
   const { data, error } = await supabase
     .from("posts")
     .select("*, communities(id, name)")
@@ -364,12 +390,12 @@ const fetchPostById = async (id: number): Promise<Post> => {
     throw new Error(error.message);
   }
 
-  // Transform the data to match the Post interface
+  // Transform the data to match the ExtendedPost interface
   return {
     ...data,
     community_id: data.communities?.id,
     community_name: data.communities?.name,
-  } as Post;
+  } as ExtendedPost;
 };
 
 const fetchRelatedPosts = async (
